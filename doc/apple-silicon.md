@@ -94,7 +94,7 @@ Initial sanitizer findings:
 - UBSan: signed overflow in `nl-math.c`, general primitive QA.
 - ASan: stack-buffer underflow in `readStreamLine`, `nl-filesys.c`, general primitive QA.
 
-These are source defects, not passing checks. Items 8 and 9 address them.
+These initial source defects were fixed in items 8 and 9. Current core sanitizer checks pass.
 A temporary deliberate heap overflow confirmed that ASan reports a fault and returns a failing status.
 
 ## Integer boundaries
@@ -108,7 +108,7 @@ Floating conversion saturates at the representable signed bounds, including the 
 NaN conversion remains zero.
 
 The integer boundary, floating, and 10,000-case bigint tests pass under UBSan.
-The full UBSan run then reaches the separately tracked line-reading defect.
+The original full UBSan run next reached the line-reading defect. Item 9 fixed it; the current full core run passes.
 
 ## Input and memory faults
 
@@ -126,3 +126,5 @@ Default, debug, UBSan, and ASan core QA pass with no sanitizer diagnostics.
 
 Apple's GNU Make 3.81 compares whole-second timestamps.
 After editing a source file within one second of a build, delete its object in `build/` before rebuilding.
+Alternatively, use `make -B -f makefile_darwin_arm64 core-check MODE=asan` to force a rebuild.
+The handoff review used forced rebuilds in all four modes and confirmed passing core QA.

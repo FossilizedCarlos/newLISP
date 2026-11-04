@@ -1,6 +1,8 @@
 # Apple Silicon implementation status
 
-Status: Approved on 2026-11-04. Implementation in progress.
+Status: Approved on 2026-11-04. Items 1–9, including 9a and 9b, are complete.
+Items 10–14 remain pending. The current review confirms passing baseline, debug, ASan, and UBSan core QA.
+Earlier failures below describe the state at each commit, not the current test results.
 
 The [detailed plan](Updating%20newLISP%20for%20Apple%20Silicon.md) defines each item and its verification.
 Complete and commit each item before starting the next item.
@@ -51,7 +53,7 @@ Complete and commit each item before starting the next item.
   A probe found `<!-->` and `<!--->` produce a negative comment length; overlapping terminators are now rejected.
   The regression fails under ASan before the fix and passes after it. Valid parse results are unchanged.
   Debug and UBSan core QA pass. ASan core QA passes `qa-xml`, then stops at `divModBigint` (item 9b).
-- Item 9b: Complete. ASan reproduces three `divModBigint` faults with isolated divisions:
+- Item 9b: `e99fdd8`. Complete. ASan reproduces three `divModBigint` faults with isolated divisions:
   quotient writes past its storage when both operands have the same digit count, `(/ 30000000000000000000L 10000000000000000000L)`;
   a product carry writes past its storage when `ny == nx`, `(/ 999999999L 600000000L)`;
   zero trimming reads past the remainder when it is zero over all digits, `(% big big)`.
@@ -68,15 +70,12 @@ The corrected extraction command succeeded. The baseline compilation failure is 
 
 ## Items 9a and 9b
 
-Item 9 permits independent faults only as new plan items. ASan found two; both are approved and complete:
+Item 9 permits independent faults as new plan items. Both approved additions are complete:
 
-- 9a. Bound XML parser reads. `nl-xml-json.c` uses `memcmp` against the parse position (lines 222, 230, 370, 381),
-  reads 3 bytes of a 2-byte close-tag literal (356), and reads `source[closeTag - 1]` before the not-found check (354).
-  Reproduced: `(xml-parse "<a/>")`, `(xml-parse "<a")`, and `(xml-parse "<!--x")` abort under ASan; `qa-xml` aborts.
-  Proposed fix: bounded string comparisons and the not-found check before the read. Proof: focused regression and `qa-xml` under ASan.
-- 9b. Size bigint quotient storage. `divModBigint` writes `q[++sq]` beyond its `nx - ny + 1` entry `alloca` (`nl-math.c:4266`).
-  Reproduced by `qa-longnum` and `qa-bigint` under ASan. The quotient digit count needs analysis before a fix.
-  Proof: smallest failing division as a regression, 10,000-case bigint QA under ASan and UBSan.
+- 9a: `40e4e8a`. XML comparisons stop at the string terminator. Missing and overlapping closing tags are rejected before indexing.
+  The focused XML regression and core XML QA pass under ASan and UBSan.
+- 9b: `e99fdd8`. Quotient storage includes the sign slot and all digits. Product storage includes the carry digit.
+  Zero trimming checks its bound before reading. Focused division and 10,000-case bigint QA pass under both sanitizers.
 
 ## Benchmark workloads (item 12)
 
@@ -86,4 +85,24 @@ The archived newlisp.org Docs page lists manuals, translations, videos, and one 
 Code Patterns and the manual are already in `doc/`; their examples may supply synthetic workload shapes.
 Report all benchmark results as synthetic.
 
-Next action: Commit item 9b, then validate shared-library loading and embedding (item 10).
+## Review after the Opus handoff
+
+Reviewed commits `59612b5`, `40e4e8a`, `e99fdd8`, and `0313669` against the source and working agreement.
+No additional code defect was found in those changes.
+Forced rebuilds avoid relying on the previous objects or whole-second timestamps:
+
+```sh
+make -B -f makefile_darwin_arm64 core-check MODE=baseline
+make -B -f makefile_darwin_arm64 core-check MODE=debug
+make -B -f makefile_darwin_arm64 core-check MODE=asan
+make -B -f makefile_darwin_arm64 core-check MODE=ubsan
+```
+
+All four commands exit zero. ASan and UBSan report no diagnostics in the core suite.
+A temporary independent test compares 300 signed divisions, with operands up to 100 decimal digits, against Python integer results.
+Both sanitizer builds match every quotient and remainder. The Python reference truncates quotients toward zero, as newLISP does.
+Review logs are in `/tmp/newlisp-opus-review/` and are local temporary artifacts.
+These results do not cover other architectures or tests outside the core suite.
+
+The review updates documentation only. The agent instruction file remains unchanged.
+Next implementation item: shared-library loading and embedding (item 10).

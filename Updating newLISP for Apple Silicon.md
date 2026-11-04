@@ -10,7 +10,10 @@ tags:
 
 ## Status and build responsibility
 
-The user approved implementation on 2026-11-04. The baseline build has run and failed as recorded below.
+The user approved implementation on 2026-11-04. Items 1–9, including additions 9a and 9b, are complete.
+The initial compilation and sanitizer failures are resolved in the tested core suite.
+A review after the Opus handoff confirms passing forced builds in baseline, debug, ASan, and UBSan modes.
+Items 10–14 remain pending. Shared-library loading and embedding are next.
 
 I will run `make` and inspect its output under the approved plan. You do not need to run it yourself.
 I will also run the regression tests, sanitizer builds, and benchmarks described below.
@@ -19,7 +22,7 @@ I will not run installation targets or publish changes as part of this plan.
 
 The current machine reports ARM64 and Apple Clang 21.0.0 through `xcrun`.
 Homebrew is available. `pkg-config` was not found on the current PATH.
-Readline and libffi availability, versions, and architectures still require verification.
+The ARM64 build links successfully against the SDK Readline compatibility library and libffi. No packages were installed.
 
 ## Working agreement
 
@@ -33,7 +36,7 @@ Use Git commits as backups. Keep the original extracted distribution and archive
 
 The previously authorized `.gitignore` change was committed separately as `2554046`.
 
-## Findings from the source
+## Findings from the original source
 
 - `configure` selects `makefile_darwinLP64_utf8_ffi` for macOS without an architecture-specific branch.
 - That makefile assigns `CC = cc`, uses `-m64 -O1`, and strips the executable.
@@ -44,7 +47,7 @@ The previously authorized `.gitignore` change was committed separately as `25540
 - `make test` filters output through `grep`. It is not sufficient evidence that all tests pass.
 - The current `clean` target removes broad filename patterns and changes permissions. Review it before use.
 
-The earlier line-reading report was not supplied. Locate and reproduce the fault before describing it as confirmed.
+The original line-reading report was not supplied. Item 9 independently reproduced and fixed the buffer underflow.
 
 ## Implementation sequence
 
@@ -174,7 +177,7 @@ If a runner is unavailable, record the blocker and do not claim CI verification 
 ### 12. Measure and select release optimization
 
 Add reproducible benchmark workloads for evaluation, allocation, lists, symbols, numeric operations, and FFI.
-Request representative user programs and expected results before claiming gains for real workloads.
+Use synthetic workloads as selected by the user. Do not claim gains for real user programs.
 Compare the correctness baseline with `-O2`, `-O3`, and supported LTO configurations.
 Use warmups, repeated runs, identical inputs, and recorded hardware and toolchain settings.
 Measure elapsed time, variability, and relevant memory use. Preserve symbols for profiling.
@@ -287,3 +290,13 @@ The user has no representative programs ready and chose synthetic benchmarks.
 The archived newlisp.org Docs page provides manuals, translations, videos, and one network-bound script (`gc.txt`).
 It provides no repeatable benchmark workload. Code Patterns and the manual in `doc/` may guide synthetic workload design.
 Item 12 reports all results as synthetic and makes no claim about real workloads.
+
+### 2026-11-04: Review after the Opus handoff
+
+Reviewed the item 9, 9a, and 9b fixes and the documentation follow-up. No further code defect was found in those changes.
+Forced rebuilds pass core QA in baseline, debug, ASan, and UBSan modes, including 10,000-case bigint QA.
+An independent Python reference confirms 300 signed division and remainder cases under both sanitizers.
+
+The review reconciles the current status with the historical failure notes and records item 9b as `e99fdd8`.
+Item 12 now states the synthetic-workload decision directly. The earlier dated adjustment remains as history.
+Items 10–14 have not started. This review makes no performance or cross-platform verification claim.
