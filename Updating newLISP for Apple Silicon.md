@@ -232,3 +232,14 @@ The user approved moving item 5 before item 2 and authorized documented sequenci
 Execution order is now 1, 5, 2, 3, 4, then 6–14.
 Item 5 uses a focused callback fixture first. Items 3 and 7 extend its regression and sanitizer verification.
 See [the baseline report](doc/apple-silicon-baseline.md) for the reproduction and blocked checks.
+
+### 2026-11-04: Native configuration recovery after two failed builds
+
+Item 2 stopped after two failed build attempts.
+The first attempt invoked the resolved Clang binary without an explicit SDK path, so SDK headers were unavailable.
+The second attempt used the stale copy in `makefile_build`, which did not contain the SDK correction.
+
+Revised item 2: select an explicit SDK and generate a forwarding include instead of copying the native makefile.
+Make configuration depend on the native makefile. Verify regeneration before rebuilding.
+This prevents stale build rules after source changes. The user authorized documented plan adjustments.
+No runtime behavior or public API changes are added by this recovery.

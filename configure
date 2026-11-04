@@ -1,5 +1,14 @@
 #!/bin/sh
 
+# Native builds do not need the legacy cleanup or memory-model probe.
+if [ "$(uname -s)" = Darwin ] && [ "$(uname -m)" = arm64 ] &&
+   [ "${os_type:-MAC_OSX}" = MAC_OSX ]; then
+    printf 'include makefile_darwin_arm64\n' > makefile_build
+    cp makefile_original_install makefile_install
+    echo "Configured native ARM64, UTF-8, Readline, and libffi. Run make."
+    exit 0
+fi
+
 # Only LP64, LLP64 and ILP32 memory models are supported
 echo
 echo "removing old objects and setting correct permissions ..."

@@ -26,16 +26,22 @@ VERSION = 10.7.5
 INT_VERSION = 10705
 
 default: makefile_build
-	make -f makefile_build
+	$(MAKE) -f makefile_build
 
-makefile_build:
+makefile_build: configure makefile_darwin_arm64
 	./configure
 
 all: default
 
+.PHONY: arm64
+arm64:
+	$(MAKE) -f makefile_darwin_arm64
+
+
 help:
 	@echo "\nDo one of the following:"
 	@echo "  make                 # auto-select one of the predefined makefiles and build newLISP"
+	@echo "  make arm64           # build natively for Apple Silicon"
 	@echo "  make help            # display this help"
 	@echo "  make install         # install on LINUX/UNIX in /usr/local/bin and /usr/local/share (need to be root)"
 	@echo "  make uninstall       # uninstall on LINUX/UNIX from /usr/local/bin and /usr/local/share (need to be root)"
@@ -114,6 +120,10 @@ macosall:
 
 # this cleans the tree for a rebuild using the same configuration as before
 clean:
+ifeq ($(shell uname -s)-$(shell uname -m),Darwin-arm64)
+	rm -rf build/arm64
+	rm -f newlisp newlisp.dylib makefile_build makefile_install
+else
 	-rm -f *~ *.bak *.o *.obj *.map *.core core *.tgz *.txt TEST newlisp-universal
 	-rm -f newlisp-js*.*
 	-rm -rf newlisp-js-$(VERSION)
@@ -123,6 +133,8 @@ clean:
 	-chmod 644 doc/* modules/*.lsp examples/*.lsp examples/*.html
 	-chmod 755 doc/index.cgi
 	-rm -f makefile_build makefile_install config.h test-*
+
+endif
 
 # run test scripts
 

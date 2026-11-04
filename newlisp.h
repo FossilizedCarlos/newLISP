@@ -111,7 +111,11 @@
 #ifdef FFI
 
 #if defined(MAC_OSX)
+#ifdef NEWLISP_FFI_FLAT_HEADER
+#include <ffi.h>
+#else
 #include <ffi/ffi.h>
+#endif
 #endif
 
 #if defined(WINDOWS)  
