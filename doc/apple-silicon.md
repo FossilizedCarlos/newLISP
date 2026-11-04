@@ -119,4 +119,10 @@ A line that begins with a NUL byte is still truncated at that byte.
 `xml-parse` no longer reads past the document or a close-tag literal for empty elements and unterminated tags.
 A comment whose `-->` overlaps its opening `<!--`, such as `<!-->`, is reported as a missing closing tag.
 
-Debug and UBSan core QA pass. ASan core QA stops at bigint quotient storage in `divModBigint`.
+Bigint division no longer writes past its quotient or product storage, or reads past a zero remainder.
+Operands with the same digit count, such as `(/ 30000000000000000000L 10000000000000000000L)`, were affected.
+
+Default, debug, UBSan, and ASan core QA pass with no sanitizer diagnostics.
+
+Apple's GNU Make 3.81 compares whole-second timestamps.
+After editing a source file within one second of a build, delete its object in `build/` before rebuilding.

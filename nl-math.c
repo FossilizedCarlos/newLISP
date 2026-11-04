@@ -4231,8 +4231,10 @@ if(cmpAbsBigint(x, nx, y, ny) < 0)
     }
 
 r = alloca((nx + 1) * sizeof(int));
-q = alloca((nx - ny + 1) * sizeof(int));
-p = alloca((nx + 1) * sizeof(int));
+/* sign slot plus up to nx - ny + 1 quotient digits */
+q = alloca((nx - ny + 2) * sizeof(int));
+/* a carry can extend the product to ny + 1 digits when ny == nx */
+p = alloca((nx + 2) * sizeof(int));
 
 nr = 0; sq = 0;
 r[0] = q[0] = p[0] = 1; 
@@ -4331,7 +4333,7 @@ for(i = 1; i <= nx; i++)
 TRIM_ZEROS:
     if(r[1] == 0) {
         k = 1; n = 0;
-        while (r[k] == 0 && k <= nr) n++, k++;
+        while (k <= nr && r[k] == 0) n++, k++;
         if(n == nr) nr = 1;
         else
             {

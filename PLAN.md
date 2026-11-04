@@ -46,20 +46,29 @@ Complete and commit each item before starting the next item.
   Debug and UBSan core QA pass. ASan core QA passes through `qa-dot` and stops at the XML parser (item 9a).
   ASan also finds a bigint division fault in `qa-longnum` and `qa-bigint` (item 9b).
 - Items 9a and 9b: Approved by the user on 2026-11-04.
-- Item 9a: Complete. ASan reproduces XML parser overreads for `<a/>`, `<a`, and `<!--x`.
+- Item 9a: `40e4e8a`. Complete. ASan reproduces XML parser overreads for `<a/>`, `<a`, and `<!--x`.
   Parse-position checks use bounded comparisons. The not-found check precedes the self-closing check.
   A probe found `<!-->` and `<!--->` produce a negative comment length; overlapping terminators are now rejected.
   The regression fails under ASan before the fix and passes after it. Valid parse results are unchanged.
   Debug and UBSan core QA pass. ASan core QA passes `qa-xml`, then stops at `divModBigint` (item 9b).
-- Item 9b: Pending.
+- Item 9b: Complete. ASan reproduces three `divModBigint` faults with isolated divisions:
+  quotient writes past its storage when both operands have the same digit count, `(/ 30000000000000000000L 10000000000000000000L)`;
+  a product carry writes past its storage when `ny == nx`, `(/ 999999999L 600000000L)`;
+  zero trimming reads past the remainder when it is zero over all digits, `(% big big)`.
+  Quotient storage holds `nx - ny + 1` digits, product storage holds `nx + 1` digits, and trimming checks the bound first.
+  The regression covers each case and checks `q*y + r = x` and `|r| < |y|` for 2,000 seeded random operand pairs.
+  It fails under ASan before the fix and passes after it.
+  Default, debug, UBSan, and ASan core QA pass, including 10,000-case bigint QA. No sanitizer diagnostics remain in core QA.
+  Residual risk: GNU Make 3.81 compares whole-second timestamps. An edit in the same second as a build is not recompiled.
+  Two before/after checks were affected and repeated after deleting the generated object.
 - Items 10–14: Pending.
 
 One baseline setup command used a Python tar option unavailable in the installed Python.
 The corrected extraction command succeeded. The baseline compilation failure is a recorded source defect.
 
-## Approved items 9a and 9b
+## Items 9a and 9b
 
-Item 9 permits independent faults only as new plan items. ASan found two:
+Item 9 permits independent faults only as new plan items. ASan found two; both are approved and complete:
 
 - 9a. Bound XML parser reads. `nl-xml-json.c` uses `memcmp` against the parse position (lines 222, 230, 370, 381),
   reads 3 bytes of a 2-byte close-tag literal (356), and reads `source[closeTag - 1]` before the not-found check (354).
@@ -77,4 +86,4 @@ The archived newlisp.org Docs page lists manuals, translations, videos, and one 
 Code Patterns and the manual are already in `doc/`; their examples may supply synthetic workload shapes.
 Report all benchmark results as synthetic.
 
-Next action: Commit item 9a, then reproduce and fix the bigint quotient storage fault (item 9b).
+Next action: Commit item 9b, then validate shared-library loading and embedding (item 10).
