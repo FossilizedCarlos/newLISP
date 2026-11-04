@@ -1,0 +1,13 @@
+#!/usr/bin/env newlisp
+; Pass the fixture library through NEWLISP_TEST_LIBRARY.
+(import (env "NEWLISP_TEST_LIBRARY") "call_mixed_callback" "double" "void*" "int" "double")
+(define (mixed-callback n x) (add n x))
+(set 'callback-address (callback 'mixed-callback "double" "int" "double"))
+(dotimes (i 1000)
+    (unless (and
+        (= callback-address (callback 'mixed-callback "double" "int" "double"))
+        (= (call_mixed_callback callback-address -7 3.5) -3.5))
+        (println "FAIL: native callback")
+        (exit 1)))
+(println ">>>>> native callback SUCCESSFUL")
+(exit 0)

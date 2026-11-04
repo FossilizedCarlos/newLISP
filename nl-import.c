@@ -25,9 +25,6 @@
 #include <dlfcn.h>
 #endif
 
-#ifdef MAC_OSX
-#include <sys/mman.h>
-#endif
 
 UINT cdeclFunction(UINT fAddress, UINT * args, int count);
 extern int evalCatchFlag;
@@ -511,10 +508,6 @@ FFIMPORT *ffi;
 char * cb_name;
 int result, len;
 
-#ifdef MAC_OSX
-ffi_closure *closure;
-#endif
-
 #endif /* FFI */
 
 cell = evaluateExpression(params);
@@ -536,6 +529,7 @@ memcpy(cb_name + 5, sPtr->name, len + 1);
 symbol = translateCreateSymbol(cb_name, CELL_NIL, mainContext, TRUE);
 if(isFFIsymbol(symbol->flags)) /* already defined */
     {
+    free(cb_name);
     ffiCell = (CELL *)symbol->contents;
     ffi = (FFIMPORT *) ffiCell->aux;
     return(stuffInteger((UINT) ffi->code));
@@ -543,8 +537,6 @@ if(isFFIsymbol(symbol->flags)) /* already defined */
 
 if(isProtected(symbol->flags))
     return(errorProcExt2(ERR_SYMBOL_PROTECTED, stuffSymbol(symbol)));
-
-symbol->flags |= SYMBOL_FFI | SYMBOL_PROTECTED;
 
 if(params->next == nilCell)
     return(errorProcExt(ERR_FFI_PREP_FAILED,nilCell));
@@ -558,52 +550,38 @@ if(ffiCell != nilCell)
     {
     ffi = (FFIMPORT *) ffiCell->aux;
     ffi->data = calloc(sizeof(ffi_closure_data), 1);
-#ifndef MAC_OSX
-    ffi->clos = ffi_closure_alloc(sizeof(ffi_closure),&ffi->code);
+    if(!ffi->data)
+        goto CALLBACK_ALLOC_FAILED;
+    ffi->clos = ffi_closure_alloc(sizeof(ffi_closure), &ffi->code);
     if(!ffi->clos)
-        {
-        free(ffi->data);
-        return(errorProcExt(ERR_FFI_PREP_FAILED,nilCell));
-        }
-    result = ffi_prep_closure_loc(ffi->clos, &ffi->cif, ffi_trampoline, ffi->data, ffi->code);
+        goto CALLBACK_ALLOC_FAILED;
+    result = ffi_prep_closure_loc(ffi->clos, &ffi->cif,
+                    ffi_trampoline, ffi->data, ffi->code);
     if(result != FFI_OK)
-        {
-        free(ffi->data);
-        return(errorProcExt(ERR_FFI_PREP_FAILED, stuffSymbol(sPtr)));
-        }
-#else /* MAC_OSX */
-    if((closure = mmap(NULL, sizeof(ffi_closure), PROT_READ | PROT_WRITE,
-             MAP_ANON | MAP_PRIVATE, -1, 0)) == (void*)-1)
-        {
-        free(ffi->data);
-        return(errorProcExt(ERR_FFI_PREP_FAILED, stuffSymbol(sPtr)));
-        }
-    ffi->clos = closure;
-    if((result = ffi_prep_closure(closure, &ffi->cif, ffi_trampoline, ffi->data)) != FFI_OK)
-        {
-        free(ffi->data);
-        munmap(closure, sizeof(closure));
-        return(errorProcExt(ERR_FFI_PREP_FAILED, stuffSymbol(sPtr)));
-        }
-    if(mprotect(closure, sizeof(closure), PROT_READ | PROT_EXEC) == -1)
-        {
-        free(ffi->data);
-        munmap(closure, sizeof(closure));
-        return(errorProcExt(ERR_FFI_PREP_FAILED, stuffSymbol(sPtr)));
-        }
-    /* ffi->code = ffi_trampoline; */
-    ffi->code = closure;
-#endif
+        goto CALLBACK_ALLOC_FAILED;
+    /* Published callbacks remain alive for the interpreter lifetime.
+       Native callers can retain the executable address. */
     ffi->data->symbol = sPtr;
     ffi->data->code = ffi->code;
 
     deleteList((CELL *)symbol->contents);
     symbol->contents = (UINT)ffiCell;
+    symbol->flags |= SYMBOL_FFI | SYMBOL_PROTECTED;
 
     return(stuffInteger((UINT) ffi->code));
     }
 else
     return(errorProcExt(ERR_FFI_PREP_FAILED, stuffString(sPtr->name)));
+
+CALLBACK_ALLOC_FAILED:
+if(ffi->clos)
+    ffi_closure_free(ffi->clos);
+free(ffi->data);
+free(ffi->cif.arg_types);
+free(ffi->name);
+free(ffi);
+deleteList(ffiCell);
+return(errorProcExt(ERR_FFI_PREP_FAILED, stuffSymbol(sPtr)));
 #endif /* FFI */
 
 CALLBACK_SIMPLE:

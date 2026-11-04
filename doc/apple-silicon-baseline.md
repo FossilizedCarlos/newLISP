@@ -44,3 +44,13 @@ Avoid `make test` as the sole check: its output filter can hide the underlying c
 Move item 5, callback compatibility, before item 2. The user approved this change.
 Validate callback allocation directly before the full regression fixtures become available.
 Rerun the callback fixtures after item 3 and sanitizer checks after item 7.
+
+## First working native reference
+
+After callback modernization, the existing makefile builds an ARM64 executable successfully.
+`newlisp -v` reports 64-bit, UTF-8, and libffi support.
+`qa-dot` and `qa-libffi` report success with exit status zero.
+The focused callback fixture passes 1,000 calls and repeated address lookup.
+A temporary closure-preparation fault permits a successful retry after cleanup.
+Published callbacks remain allocated for the interpreter lifetime, as native callers can retain their addresses.
+Sanitizer checks and performance measurements remain pending.
