@@ -26,14 +26,18 @@ Complete and commit each item before starting the next item.
 - Item 4: `4b2e1f1`. Complete. ASan reproduces the old return-buffer overflow; the corrected FFI suite passes under ASan.
   Return storage meets the prepared size, register-size minimum, and alignment.
   The argument vector now follows the prepared count. Regressions cover 24-byte returns and 20 arguments.
-- Item 6: Complete. Explicit variadic marker approved by the user and implemented.
+- Item 6: `aa3fb24`. Complete. Explicit variadic marker approved by the user and implemented.
   Mixed variadic calls, legacy machine-word calls, invalid floating arguments, structures, and existing callbacks pass.
   The complete FFI fixtures pass normally and under ASan. The libc variadic test passes with its declared boundary.
   Added its missing completion marker after the QA driver correctly rejected incomplete success reporting.
   Unknown native signatures cannot be introspected; caller obligations and unsupported aggregate callback returns are documented.
-- Items 7–14: Pending.
+- Item 7: Complete. Named debug, ASan, and UBSan modes compile and link with separate configuration directories.
+  Debug core QA passes. The QA driver detects intentional failures and existing sanitizer faults.
+  UBSan finds signed overflow in `nl-math.c:368`; ASan finds a read underflow in `nl-filesys.c:666`.
+  These defects block clean sanitizer suites and are assigned to items 8 and 9.
+- Items 8–14: Pending.
 
 One baseline setup command used a Python tar option unavailable in the installed Python.
 The corrected extraction command succeeded. The baseline compilation failure is a recorded source defect.
 
-Next action: Commit item 6, then add named sanitizer modes and run the wider QA suite (item 7).
+Next action: Commit item 7, then reproduce and correct integer boundary behavior (item 8).

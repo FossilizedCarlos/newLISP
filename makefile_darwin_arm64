@@ -5,14 +5,25 @@ CC := $(shell xcrun --find clang)
 endif
 CC ?= $(shell xcrun --find clang)
 SDKROOT ?= $(shell xcrun --sdk macosx --show-sdk-path)
-CFLAGS ?= -O1 -g
 MODE ?= baseline
+ifeq ($(MODE),debug)
+DEFAULT_CFLAGS := -O0 -g
+else
+DEFAULT_CFLAGS := -O1 -g
+endif
+ifeq ($(MODE),asan)
+MODE_FLAGS := -fsanitize=address -fno-omit-frame-pointer
+endif
+ifeq ($(MODE),ubsan)
+MODE_FLAGS := -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer
+endif
+CFLAGS ?= $(DEFAULT_CFLAGS)
 ARCH := arm64
 REQUIRED_CPPFLAGS := -DREADLINE -DNEWLISP64 -DMAC_OSX -DSUPPORT_UTF8 -DFFI
 SOURCES := newlisp.c nl-symbol.c nl-math.c nl-list.c nl-liststr.c nl-string.c \
  nl-filesys.c nl-sock.c nl-import.c nl-xml-json.c nl-web.c nl-matrix.c \
  nl-debug.c pcre.c nl-utf8.c
-CONFIG_KEY := $(shell printf '%s\n' '$(SDKROOT)' '$(CC)' '$(CPPFLAGS)' '$(CFLAGS)' '$(LDFLAGS)' '$(LDLIBS)' | shasum | cut -c1-12)
+CONFIG_KEY := $(shell printf '%s\n' '$(SDKROOT)' '$(CC)' '$(CPPFLAGS)' '$(CFLAGS)' '$(MODE_FLAGS)' '$(LDFLAGS)' '$(LDLIBS)' | shasum | cut -c1-12)
 BUILD_DIR := build/$(ARCH)/$(MODE)/$(CONFIG_KEY)
 OBJECTS := $(SOURCES:%.c=$(BUILD_DIR)/%.o)
 BINARY := $(BUILD_DIR)/newlisp
@@ -29,10 +40,10 @@ include $(BUILD_DIR)/deps.mk
 endif
 
 $(BUILD_DIR)/%.o: %.c makefile_darwin_arm64 $(BUILD_DIR)/deps.mk
-	$(CC) $(CPPFLAGS) $(DEP_CPPFLAGS) $(REQUIRED_CPPFLAGS) $(CFLAGS) -Wall -isysroot "$(SDKROOT)" -arch arm64 -MMD -MP -c $< -o $@
+	$(CC) $(CPPFLAGS) $(DEP_CPPFLAGS) $(REQUIRED_CPPFLAGS) $(CFLAGS) $(MODE_FLAGS) -Wall -isysroot "$(SDKROOT)" -arch arm64 -MMD -MP -c $< -o $@
 
 $(BINARY): $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) $(LDFLAGS) $(DEP_LDFLAGS) -isysroot "$(SDKROOT)" -arch arm64 $(LDLIBS) -lm -lreadline -lffi -o $@
+	$(CC) $(CFLAGS) $(MODE_FLAGS) $(OBJECTS) $(LDFLAGS) $(DEP_LDFLAGS) -isysroot "$(SDKROOT)" -arch arm64 $(LDLIBS) -lm -lreadline -lffi -o $@
 
 clean:
 	rm -rf build/arm64
@@ -41,10 +52,16 @@ clean:
 
 .PHONY: ffi-check
 $(BUILD_DIR)/ffitest.dylib: util/ffitest.c util/arm64-callback.c $(BUILD_DIR)/deps.mk
-	$(CC) $(CPPFLAGS) $(DEP_CPPFLAGS) $(CFLAGS) -isysroot "$(SDKROOT)" -arch arm64 -dynamiclib util/ffitest.c util/arm64-callback.c $(LDFLAGS) -o $@
+	$(CC) $(CPPFLAGS) $(DEP_CPPFLAGS) $(CFLAGS) $(MODE_FLAGS) -isysroot "$(SDKROOT)" -arch arm64 -dynamiclib util/ffitest.c util/arm64-callback.c $(LDFLAGS) -o $@
 
 ffi-check: all $(BUILD_DIR)/ffitest.dylib
 	NEWLISP_TEST_LIBRARY='$(abspath $(BUILD_DIR)/ffitest.dylib)' sh build-support/run-qa.sh ./newlisp qa-specific-tests/qa-libffi $(BUILD_DIR)/qa-libffi.log
 	NEWLISP_TEST_LIBRARY='$(abspath $(BUILD_DIR)/ffitest.dylib)' sh build-support/run-qa.sh ./newlisp qa-specific-tests/qa-arm64-callback $(BUILD_DIR)/qa-arm64-callback.log
 	NEWLISP_TEST_LIBRARY='$(abspath $(BUILD_DIR)/ffitest.dylib)' sh build-support/run-qa.sh ./newlisp qa-specific-tests/qa-ffi-storage $(BUILD_DIR)/qa-ffi-storage.log
 	NEWLISP_TEST_LIBRARY='$(abspath $(BUILD_DIR)/ffitest.dylib)' sh build-support/run-qa.sh ./newlisp qa-specific-tests/qa-ffi-abi $(BUILD_DIR)/qa-ffi-abi.log
+
+CORE_QA := qa-dot qa-specific-tests/qa-dictionary qa-specific-tests/qa-xml  qa-specific-tests/qa-json qa-specific-tests/qa-ref qa-specific-tests/qa-blockmemory  qa-specific-tests/qa-exception qa-specific-tests/qa-float qa-specific-tests/qa-foop  qa-specific-tests/qa-inplace qa-specific-tests/qa-longnum
+.PHONY: core-check
+core-check: ffi-check
+	@set -e; for test in $(CORE_QA); do 	  sh build-support/run-qa.sh ./newlisp $$test $(BUILD_DIR)/$$(basename $$test).log; 	done
+	sh build-support/run-qa.sh ./newlisp qa-specific-tests/qa-bigint $(BUILD_DIR)/qa-bigint.log 10000

@@ -14,7 +14,7 @@ if grep -Ei '(^ERR:|FAIL:|>>>.*(ERR|PROBLEM|failed)|=> nil|runtime error:|ERROR:
     echo "FAIL: $script reported a failure" >&2
     exit 1
 fi
-if ! grep 'SUCCESSFUL' "$log" >/dev/null; then
+if ! grep -E 'SUC+ESSFUL' "$log" >/dev/null; then
     echo "FAIL: $script did not report completion" >&2
     exit 1
 fi

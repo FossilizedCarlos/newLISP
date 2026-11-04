@@ -72,3 +72,27 @@ They now use libffi rather than non-prototype C calls.
 Floating arguments and excess arguments produce errors. Migrate these calls to typed imports.
 Untyped imports cannot infer narrow stack argument layouts, floating returns, structures, or variadic boundaries.
 Use typed imports for those functions. Aggregate callback returns still require a separate audit; do not rely on them.
+
+## Debug and sanitizer checks
+
+```sh
+make -f makefile_darwin_arm64 core-check MODE=debug
+make -f makefile_darwin_arm64 core-check MODE=asan
+make -f makefile_darwin_arm64 core-check MODE=ubsan
+```
+
+Each mode has separate objects. Sanitizer flags reach the executable and fixture library.
+UBSan stops on the first diagnostic. Logs remain under the selected configuration directory.
+`core-check` includes FFI, general primitives, dictionaries, XML, JSON, references, memory allocation, exceptions, floats, objects, and integers.
+The general primitive suite uses local sockets and subprocesses.
+Dedicated external-network, interactive, signal, process, and benchmark tests remain outside this core target.
+Other operating systems and Intel macOS have not been executed.
+The QA driver accepts the existing JSON test's misspelled completion marker but still rejects its failure marker.
+
+Initial sanitizer findings:
+
+- UBSan: signed overflow in `nl-math.c`, general primitive QA.
+- ASan: stack-buffer underflow in `readStreamLine`, `nl-filesys.c`, general primitive QA.
+
+These are source defects, not passing checks. Items 8 and 9 address them.
+A temporary deliberate heap overflow confirmed that ASan reports a fault and returns a failing status.
