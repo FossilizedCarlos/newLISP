@@ -262,10 +262,28 @@ A missing boundary cannot be detected from a native symbol. This caller obligati
 
 ### 2026-11-04: Additional memory fault items 9a and 9b
 
-With the item 9 faults fixed, ASan reaches two further independent faults.
+Item 9 fixes the reported `read-line` underflow. With it fixed, ASan reaches a `t-test` overread on an exercised `qa-dot` path.
+That one-line loop bound is included in item 9 as a reproduced memory fault.
+ASan then reaches two further independent faults.
 The user approved separate items for them, in order, after item 9:
 
 - 9a. `Bound XML parser reads`: bounded comparisons at the parse position, the not-found check before reading before the match, and rejection of overlapping comment terminators.
 - 9b. `Size bigint quotient storage`: correct the `divModBigint` quotient allocation after analysis of the digit count.
+  Analysis found two more faults in the same routine. A product carry can write past product storage when both operands
+  have the same digit count, and zero trimming reads past a remainder that is zero over all digits.
+  Each was reproduced with an isolated division and is fixed in item 9b.
 
 Each item reproduces its fault, adds a regression that fails before the fix, and reruns core QA under ASan and UBSan.
+
+### 2026-11-04: Whole-second timestamps in GNU Make 3.81
+
+Apple's GNU Make 3.81 compares timestamps to the second. A source edit in the same second as a build is not recompiled.
+Two item 9 before/after checks ran a stale binary for this reason. They were repeated after deleting the generated object.
+Before/after verification deletes the affected object before rebuilding. The build rules are unchanged.
+
+### 2026-11-04: Synthetic benchmark workloads for item 12
+
+The user has no representative programs ready and chose synthetic benchmarks.
+The archived newlisp.org Docs page provides manuals, translations, videos, and one network-bound script (`gc.txt`).
+It provides no repeatable benchmark workload. Code Patterns and the manual in `doc/` may guide synthetic workload design.
+Item 12 reports all results as synthetic and makes no claim about real workloads.
