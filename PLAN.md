@@ -1,15 +1,17 @@
 # Apple Silicon implementation status
 
-Status: Awaiting approval. No implementation build or runtime test has run.
+Status: Approved on 2026-11-04. Implementation in progress.
 
-The detailed steps and verification criteria are in [Updating newLISP for Apple Silicon](Updating%20newLISP%20for%20Apple%20Silicon.md).
+The [detailed plan](Updating%20newLISP%20for%20Apple%20Silicon.md) defines each item and its verification.
+Complete and commit each item before starting the next item.
 
-Complete and commit each item before starting the next item. Record results and commit hashes here.
+- Planning commit: `ea0f278`.
+- Ignore rules: `2554046`; checked for whitespace errors and tracked-file matches.
+- Item 1: Complete. Baseline `make` exits 2 at the unavailable legacy callback API. Runtime checks are blocked.
+- Item 5: Next. Move before item 2 with user approval; record the reason in the detailed plan.
+- Items 2–4 and 6–14: Pending.
 
-- Planning: Source inspection and plan creation complete; implementation approval pending.
-- Existing `.gitignore` change: Previously authorized; remains uncommitted and separate from this plan.
-- Items 1–14: Pending approval and execution.
+One baseline setup command used a Python tar option unavailable in the installed Python.
+The corrected extraction command succeeded. The baseline compilation failure is a recorded source defect.
 
-Next action: Obtain approval for the implementation plan, then commit the existing ignore rules and start item 1.
-
-If two attempts fail on one step, record both failures and revise the plan with the user.
+Next action: Commit the baseline report, then modernize callback allocation and test native callbacks.

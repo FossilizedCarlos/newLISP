@@ -10,9 +10,9 @@ tags:
 
 ## Status and build responsibility
 
-This plan awaits approval. Implementation has not started. No build or runtime test has run during planning.
+The user approved implementation on 2026-11-04. The baseline build has run and failed as recorded below.
 
-I will run `make` and inspect its output after you approve this plan. You do not need to run it yourself.
+I will run `make` and inspect its output under the approved plan. You do not need to run it yourself.
 I will also run the regression tests, sanitizer builds, and benchmarks described below.
 I will request approval before installing software. Missing dependencies will be reported with the required package and purpose.
 I will not run installation targets or publish changes as part of this plan.
@@ -31,8 +31,7 @@ After two failed attempts on a step, stop and revise the plan with the user.
 Request approval for material scope changes. Do not create empty commits for work that proves unnecessary.
 Use Git commits as backups. Keep the original extracted distribution and archive unchanged.
 
-The existing `.gitignore` modification remains separate from this planning commit.
-Commit that previously authorized change before implementation, after checking its final contents.
+The previously authorized `.gitignore` change was committed separately as `2554046`.
 
 ## Findings from the source
 
@@ -223,3 +222,13 @@ No performance improvement is claimed without measurement. Other architectures a
 
 Recheck the applicable documentation and installed headers during implementation.
 The closure API requires paired allocation and release, plus separate writable and executable addresses.
+
+## Execution adjustments
+
+### 2026-11-04: Callback compatibility precedes native-build verification
+
+The baseline build fails because the ARM64 SDK does not declare legacy `ffi_prep_closure`.
+The user approved moving item 5 before item 2 and authorized documented sequencing changes.
+Execution order is now 1, 5, 2, 3, 4, then 6–14.
+Item 5 uses a focused callback fixture first. Items 3 and 7 extend its regression and sanitizer verification.
+See [the baseline report](doc/apple-silicon-baseline.md) for the reproduction and blocked checks.
