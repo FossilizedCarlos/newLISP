@@ -48,3 +48,48 @@ icmp6.h
 TAGS
 XTAGS
 *.stackdump
+
+# macOS Updates
+.DS_Store
+
+# Operating system metadata
+.AppleDouble/
+.LSOverride
+Thumbs.db
+Desktop.ini
+
+# Editor temporary files and local settings
+*.swp
+*.swo
+*.swn
+*.orig
+*.rej
+.idea/
+.vscode/
+.cache/
+
+# Additional compiler and linker output
+*.obj
+*.a
+*.lib
+*.so.*
+*.dSYM/
+*.pdb
+*.ilk
+/newlisp-amal.c
+/build/
+/compile_commands.json
+
+# Profiling and crash output
+*.profraw
+*.profdata
+/gmon.out
+/core
+/core.[0-9]*
+
+# Local environment settings
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
