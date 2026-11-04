@@ -221,6 +221,10 @@ while(params->type != CELL_NIL && count < 14)
             break;
 #endif
         case CELL_FLOAT:
+#if defined(MAC_OSX) && defined(__aarch64__)
+            /* Floating arguments require a typed native signature. */
+            return(errorProcExt(ERR_INVALID_PARAMETER, arg));
+#endif
 #ifndef NEWLISP64
             args[count++] = arg->aux;
 #endif
@@ -233,6 +237,11 @@ while(params->type != CELL_NIL && count < 14)
     params = (CELL *)params->next;
     }
 
+#if defined(MAC_OSX) && defined(__aarch64__)
+if(params->type != CELL_NIL)
+    return(errorProc(ERR_NUM_ARGS));
+#endif
+
 #if defined(WINDOWS) || defined(CYGWIN)
 if(pCell->type == CELL_IMPORT_DLL)
     return(stuffInteger(stdcallFunction(pCell->contents, args, count)));
@@ -244,6 +253,23 @@ return(stuffInteger(cdeclFunction(pCell->contents, args, count)));
 
 UINT cdeclFunction(UINT fAddress, UINT * args, int count)
 {
+#if defined(MAC_OSX) && defined(__aarch64__) && defined(FFI)
+/* The legacy API describes machine-word integer and pointer calls only. */
+ffi_cif cif;
+ffi_type *types[14];
+void *values[14];
+ffi_arg result;
+int i;
+for(i = 0; i < count; ++i)
+    {
+    types[i] = &ffi_type_uint64;
+    values[i] = &args[i];
+    }
+if(ffi_prep_cif(&cif, FFI_DEFAULT_ABI, count, &ffi_type_uint64, types) != FFI_OK)
+    errorProc(ERR_FFI_PREP_FAILED);
+ffi_call(&cif, FFI_FN(fAddress), &result, values);
+return((UINT)result);
+#else
 UINT (*function)();
 
 function = (UINT (*)())fAddress;
@@ -312,6 +338,7 @@ switch(count)
     }
 
 return(0);
+#endif
 }
 
 
@@ -888,7 +915,8 @@ CELL * ffiPreparation(CELL * pCell, CELL * params, int type)
     CELL * arg;
     FFIMPORT * ffi;
     ffi_type **atypes;
-    unsigned int nargs;
+    unsigned int nargs, fixedargs = 0;
+    int variadic = 0;
     ffi_type *rtype;
 
     if(pCell->type != CELL_IMPORT_FFI)
@@ -918,10 +946,24 @@ CELL * ffiPreparation(CELL * pCell, CELL * params, int type)
         {
         if(arg->type == CELL_STRING)
             {
+            if(strcmp((char *)arg->contents, "...") == 0)
+                {
+                if(type != FFI_FUNCTION || variadic || nargs == 0)
+                    errorProcExt(ERR_FFI_INVALID_TYPE, arg);
+                variadic = 1;
+                fixedargs = nargs;
+                params = params->next;
+                continue;
+                }
             /* skip void arguments */
             if(strcmp((char *)arg->contents,"void") != 0)
                 {
                 atypes[nargs] = getFFIType((char *) arg->contents);
+                /* C default promotions apply after the variadic boundary. */
+                if(variadic && (atypes[nargs] == &ffi_type_float ||
+                    atypes[nargs] == &ffi_type_sint8 || atypes[nargs] == &ffi_type_uint8 ||
+                    atypes[nargs] == &ffi_type_sint16 || atypes[nargs] == &ffi_type_uint16))
+                    errorProcExt(ERR_FFI_INVALID_TYPE, arg);
                 nargs++;
                 }
             }
@@ -935,7 +977,8 @@ CELL * ffiPreparation(CELL * pCell, CELL * params, int type)
 
     ffi->cif.nargs = nargs;
     ffi->cif.arg_types = atypes;
-    if(ffi_prep_cif(&ffi->cif, FFI_DEFAULT_ABI, nargs, rtype, atypes) != FFI_OK)
+    if((variadic ? ffi_prep_cif_var(&ffi->cif, FFI_DEFAULT_ABI, fixedargs, nargs, rtype, atypes)
+                 : ffi_prep_cif(&ffi->cif, FFI_DEFAULT_ABI, nargs, rtype, atypes)) != FFI_OK)
         errorProcExt(ERR_FFI_PREP_FAILED, pCell);
 
     return(pCell);

@@ -47,3 +47,28 @@ The QA driver rejects nonzero exit status, legacy failure messages, and missing 
 
 The FFI storage regression covers a 24-byte structure return and a 20-argument call.
 Return storage follows the size, alignment, and register-width requirements in the [libffi calling documentation](https://www.chiark.greenend.org.uk/doc/libffi-dev/html/The-Basics.html).
+
+## Native FFI signatures
+
+Use typed imports for native functions. The declared types must match the C prototype.
+For a variadic function, place `"..."` after the fixed argument types:
+
+```lisp
+(import "libc.dylib" "sprintf" "int" "char*" "char*" "..." "int" "double")
+```
+
+Each imported signature declares the full argument list for that call shape.
+Use another context when you need a different signature for the same native symbol.
+The marker requires at least one fixed argument and is valid only for imported functions.
+After the marker, use promoted C types: `int` for narrow integers and `double` for `float`.
+Unpromoted variadic types are rejected. Fixed-signature imports remain unchanged.
+The implementation uses `ffi_prep_cif_var` for marked signatures.
+
+A native symbol does not expose its C signature. The interpreter cannot detect a missing variadic marker automatically.
+Calling a variadic function through an unmarked import remains invalid.
+
+On Apple Silicon, legacy untyped imports support only machine-word integer and pointer signatures, with at most 14 arguments.
+They now use libffi rather than non-prototype C calls.
+Floating arguments and excess arguments produce errors. Migrate these calls to typed imports.
+Untyped imports cannot infer narrow stack argument layouts, floating returns, structures, or variadic boundaries.
+Use typed imports for those functions. Aggregate callback returns still require a separate audit; do not rely on them.

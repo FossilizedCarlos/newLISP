@@ -23,12 +23,17 @@ Complete and commit each item before starting the next item.
 - Item 3: `dfae72a`. Complete. Portable FFI and callback tests pass using configuration-local fixture output.
   Intentional assertion failures and legacy errors with exit zero both produce a failing driver status.
   Corrected fixture C prototypes to match their declared FFI types.
-- Item 4: Complete. ASan reproduces the old return-buffer overflow; the corrected FFI suite passes under ASan.
+- Item 4: `4b2e1f1`. Complete. ASan reproduces the old return-buffer overflow; the corrected FFI suite passes under ASan.
   Return storage meets the prepared size, register-size minimum, and alignment.
   The argument vector now follows the prepared count. Regressions cover 24-byte returns and 20 arguments.
-- Items 6–14: Pending.
+- Item 6: Complete. Explicit variadic marker approved by the user and implemented.
+  Mixed variadic calls, legacy machine-word calls, invalid floating arguments, structures, and existing callbacks pass.
+  The complete FFI fixtures pass normally and under ASan. The libc variadic test passes with its declared boundary.
+  Added its missing completion marker after the QA driver correctly rejected incomplete success reporting.
+  Unknown native signatures cannot be introspected; caller obligations and unsupported aggregate callback returns are documented.
+- Items 7–14: Pending.
 
 One baseline setup command used a Python tar option unavailable in the installed Python.
 The corrected extraction command succeeded. The baseline compilation failure is a recorded source defect.
 
-Next action: Commit item 4, then audit fixed and variadic ABI behavior (item 6).
+Next action: Commit item 6, then add named sanitizer modes and run the wider QA suite (item 7).

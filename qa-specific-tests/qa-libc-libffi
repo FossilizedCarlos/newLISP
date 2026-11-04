@@ -35,7 +35,7 @@
 
 (println "\nTesting imports from " LIBC "\n")
 
-(unless (catch (import LIBC "sprintf" "int" "char*" "char*" "int" "double") 'result)
+(unless (catch (import LIBC "sprintf" "int" "char*" "char*" "..." "int" "double") 'result)
     (println ">>>>> ERR cannot find library in qa-libc-libffi")
     (exit))
 
@@ -114,4 +114,5 @@
     (atexit (callback 'quit "void" "void"))
 )
 
+(println ">>>>> libc FFI SUCCESSFUL")
 (exit)

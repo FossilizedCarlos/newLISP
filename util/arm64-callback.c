@@ -19,3 +19,25 @@ long long sum_twenty(long long a, long long b, long long c, long long d,
 {
     return a+b+c+d+e+f+g+h+i+j+k+l+m+n+o+p+q+r+s+t;
 }
+
+#include <stdarg.h>
+#include <stdint.h>
+/* Alternate integer and floating variadic arguments. */
+double sum_variadic(int pairs, ...)
+{
+    va_list args;
+    double result = 0;
+    int i;
+    va_start(args, pairs);
+    for (i = 0; i < pairs; ++i) {
+        result += va_arg(args, int);
+        result += va_arg(args, double);
+    }
+    va_end(args);
+    return result;
+}
+uintptr_t legacy_words(uintptr_t a, uintptr_t b, uintptr_t c, uintptr_t d,
+    uintptr_t e, uintptr_t f, uintptr_t g, uintptr_t h, uintptr_t i, uintptr_t j)
+{
+    return a+b+c+d+e+f+g+h+i+j;
+}

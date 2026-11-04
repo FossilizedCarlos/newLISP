@@ -251,3 +251,11 @@ Item 4 now sizes this vector from the prepared argument count.
 A 20-argument regression accompanies the large-structure return test.
 ASan reproduced the original return-buffer overflow before the fix.
 The corrected FFI suite, callback fixture, and storage regressions pass under ASan.
+
+### 2026-11-04: Explicit variadic signatures in item 6
+
+The import API has no fixed/variadic boundary. The user approved an explicit `"..."` marker after fixed argument types.
+Marked imports use `ffi_prep_cif_var`; unsupported unpromoted variadic types fail before execution.
+The ARM64 legacy path uses libffi for machine-word calls and rejects floating or excess arguments.
+The libc variadic test is updated to declare its boundary explicitly.
+A missing boundary cannot be detected from a native symbol. This caller obligation is documented.

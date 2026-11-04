@@ -1,0 +1,19 @@
+#!/usr/bin/env newlisp
+(set 'fixture (env "NEWLISP_TEST_LIBRARY"))
+(import fixture "sum_variadic" "double" "int" "..." "int" "double" "int" "double")
+(unless (= (sum_variadic 2 10 1.5 -3 2.25) 10.75)
+    (println "FAIL: variadic mixed arguments") (exit 1))
+(import fixture "legacy_words")
+(unless (= (legacy_words 1 2 3 4 5 6 7 8 9 10) 55)
+    (println "FAIL: legacy machine-word arguments") (exit 1))
+(when (and (= ostype "OSX") (= (first (exec "uname -m")) "arm64"))
+    (when (catch (legacy_words 1.5) 'error-message)
+        (println "FAIL: untyped floating argument accepted") (exit 1)))
+; Invalid variadic types must fail before calling native code.
+(context 'BadVariadic)
+(unless (not (catch
+    (import MAIN:fixture "sum_variadic" "double" "int" "..." "float") 'failure))
+    (println "FAIL: unpromoted variadic float accepted") (exit 1))
+(context MAIN)
+(println ">>>>> FFI ABI SUCCESSFUL")
+(exit 0)
