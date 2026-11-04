@@ -38,20 +38,26 @@ Complete and commit each item before starting the next item.
 - Item 8: `ca16571`. Complete. Integer boundaries, float behavior, and 10,000-case bigint QA pass under UBSan.
   Defined wrapping arithmetic, validated shift counts, handled minimum/-1 division, and corrected float saturation.
   The wider UBSan suite proceeds past arithmetic and stops at the known item 9 line-reading fault.
-- Item 9: Complete. ASan reproduces `read-line` index -1 reads for an empty line and a leading NUL byte.
+- Item 9: `59612b5`. Complete. ASan reproduces `read-line` index -1 reads for an empty line and a leading NUL byte.
   Both bounds are checked before the newline and carriage-return tests. NUL truncation behavior is unchanged.
   With that fix, ASan reaches a `t-test` overread in `qa-dot` when the first sample is longer.
   The cross-product loop is bounded by both sample lengths; it is used only for equal-length dependent samples.
   Each regression fails under ASan before its fix and passes after it.
   Debug and UBSan core QA pass. ASan core QA passes through `qa-dot` and stops at the XML parser (item 9a).
   ASan also finds a bigint division fault in `qa-longnum` and `qa-bigint` (item 9b).
-- Items 9a and 9b: Proposed. Awaiting approval. See below.
+- Items 9a and 9b: Approved by the user on 2026-11-04.
+- Item 9a: Complete. ASan reproduces XML parser overreads for `<a/>`, `<a`, and `<!--x`.
+  Parse-position checks use bounded comparisons. The not-found check precedes the self-closing check.
+  A probe found `<!-->` and `<!--->` produce a negative comment length; overlapping terminators are now rejected.
+  The regression fails under ASan before the fix and passes after it. Valid parse results are unchanged.
+  Debug and UBSan core QA pass. ASan core QA passes `qa-xml`, then stops at `divModBigint` (item 9b).
+- Item 9b: Pending.
 - Items 10–14: Pending.
 
 One baseline setup command used a Python tar option unavailable in the installed Python.
 The corrected extraction command succeeded. The baseline compilation failure is a recorded source defect.
 
-## Proposed items (awaiting approval)
+## Approved items 9a and 9b
 
 Item 9 permits independent faults only as new plan items. ASan found two:
 
@@ -71,4 +77,4 @@ The archived newlisp.org Docs page lists manuals, translations, videos, and one 
 Code Patterns and the manual are already in `doc/`; their examples may supply synthetic workload shapes.
 Report all benchmark results as synthetic.
 
-Next action: Commit item 9, then obtain approval for items 9a and 9b.
+Next action: Commit item 9a, then reproduce and fix the bigint quotient storage fault (item 9b).

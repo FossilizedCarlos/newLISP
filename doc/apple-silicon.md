@@ -116,5 +116,7 @@ The full UBSan run then reaches the separately tracked line-reading defect.
 A line that begins with a NUL byte is still truncated at that byte.
 `t-test` no longer reads past the second sample when independent samples have different lengths. Results are unchanged.
 
-Debug and UBSan core QA pass. ASan core QA stops at two separately proposed faults:
-XML parser bounds in `nl-xml-json.c` and bigint quotient storage in `divModBigint`.
+`xml-parse` no longer reads past the document or a close-tag literal for empty elements and unterminated tags.
+A comment whose `-->` overlaps its opening `<!--`, such as `<!-->`, is reported as a missing closing tag.
+
+Debug and UBSan core QA pass. ASan core QA stops at bigint quotient storage in `divModBigint`.

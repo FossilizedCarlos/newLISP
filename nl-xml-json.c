@@ -219,7 +219,7 @@ while(!xmlError && !closingFlag)
         continue;
         }
 
-    if(memcmp(source, "<!--", 4) == 0)
+    if(strncmp(source, "<!--", 4) == 0)
         {
         if(optionsFlag & OPTION_NO_COMMENTS)
             parseTag("-->");
@@ -227,7 +227,7 @@ while(!xmlError && !closingFlag)
             lastNode = appendNode(lastNode, parseTag("-->"));
         continue;
         }
-    if(memcmp(source, "<![CDATA[", 9) == 0)
+    if(strncmp(source, "<![CDATA[", 9) == 0)
         {
         lastNode = appendNode(lastNode, parseTag("]]>"));
         continue;
@@ -351,23 +351,24 @@ tagStart = source;
 
 cell = NULL;
 closeTag = find(closeTagStr, source);
-if(*(source + closeTag - 1) == '/')
-    {
-    if(memcmp(closeTagStr,"]]>",3) != 0)
-        {
-        --closeTag;
-        closeTagStr = "/>";
-        }
-    }
-
-if(closeTag == -1)
+/* a comment terminator cannot overlap its opening "<!--" */
+if(closeTag == -1 || (closeTag < 4 && strncmp(source, "<!--", 4) == 0))
     {
     snprintf(xmlMsg, 63, "expected closing tag: %s", closeTagStr);
     xmlError = xmlMsg;
     return nilCell;
     }
 
-if(memcmp(source, "<!--", 4) == 0)
+if(closeTag > 0 && *(source + closeTag - 1) == '/')
+    {
+    if(strcmp(closeTagStr,"]]>") != 0)
+        {
+        --closeTag;
+        closeTagStr = "/>";
+        }
+    }
+
+if(strncmp(source, "<!--", 4) == 0)
     {
     if(optionsFlag & OPTION_NO_COMMENTS)
         cell = nilCell;
@@ -378,7 +379,7 @@ if(memcmp(source, "<!--", 4) == 0)
         }
     }
 
-if(memcmp(source, "<![CDATA[", 9) == 0)
+if(strncmp(source, "<![CDATA[", 9) == 0)
     {
     cell = stuffStringN(source + 9, closeTag - 9);
     cell = makeTextNode(XML_CDATA, cell);

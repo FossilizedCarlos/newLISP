@@ -259,3 +259,13 @@ Marked imports use `ffi_prep_cif_var`; unsupported unpromoted variadic types fai
 The ARM64 legacy path uses libffi for machine-word calls and rejects floating or excess arguments.
 The libc variadic test is updated to declare its boundary explicitly.
 A missing boundary cannot be detected from a native symbol. This caller obligation is documented.
+
+### 2026-11-04: Additional memory fault items 9a and 9b
+
+With the item 9 faults fixed, ASan reaches two further independent faults.
+The user approved separate items for them, in order, after item 9:
+
+- 9a. `Bound XML parser reads`: bounded comparisons at the parse position, the not-found check before reading before the match, and rejection of overlapping comment terminators.
+- 9b. `Size bigint quotient storage`: correct the `divModBigint` quotient allocation after analysis of the digit count.
+
+Each item reproduces its fault, adds a regression that fails before the fix, and reruns core QA under ASan and UBSan.
