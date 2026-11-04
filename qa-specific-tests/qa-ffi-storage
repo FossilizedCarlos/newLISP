@@ -1,0 +1,15 @@
+#!/usr/bin/env newlisp
+(set 'fixture (env "NEWLISP_TEST_LIBRARY"))
+(struct 'wide-result "long long" "long long" "long long")
+(import fixture "return_wide" "wide-result" "void")
+(unless (= (return_wide) '(11 22 33))
+    (println "FAIL: large structure return") (exit 1))
+(import fixture "sum_twenty" "long long"
+    "long long" "long long" "long long" "long long" "long long"
+    "long long" "long long" "long long" "long long" "long long"
+    "long long" "long long" "long long" "long long" "long long"
+    "long long" "long long" "long long" "long long" "long long")
+(unless (= (sum_twenty 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20) 210)
+    (println "FAIL: twenty FFI arguments") (exit 1))
+(println ">>>>> FFI storage SUCCESSFUL")
+(exit 0)

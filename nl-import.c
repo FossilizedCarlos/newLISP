@@ -953,13 +953,14 @@ CELL * executeLibFFI(CELL * pCell, CELL * params)
     void **avalues;
     CELL * cell;
     void * result;
+    size_t resultSize, resultAlignment;
     double valueDouble;
 
     ffi = (FFIMPORT *)pCell->aux;
     if(ffi->type == FFI_STRUCT)
         return(pCell);
 
-    avalues = alloca(sizeof(void *) * 16);
+    avalues = alloca(sizeof(void *) * ffi->cif.nargs);
 
     while(params != nilCell)
         {
@@ -1031,7 +1032,14 @@ CELL * executeLibFFI(CELL * pCell, CELL * params)
     if(c < ffi->cif.nargs) /* not enough args */
         errorProc(ERR_NUM_ARGS); 
 
-    result = (ffi_type *) alloca(sizeof(ffi->cif.rtype->size));
+    /* libffi widens narrow integral returns to a machine register. */
+    resultSize = ffi->cif.rtype->size;
+    if(resultSize < sizeof(ffi_arg)) resultSize = sizeof(ffi_arg);
+    resultAlignment = ffi->cif.rtype->alignment;
+    if(resultAlignment < sizeof(ffi_arg)) resultAlignment = sizeof(ffi_arg);
+    result = alloca(resultSize + resultAlignment - 1);
+    result = (void *) (((UINT)result + resultAlignment - 1) /
+                       resultAlignment * resultAlignment);
 
     ffi_call(&ffi->cif, FFI_FN(pCell->contents), result, avalues);
 

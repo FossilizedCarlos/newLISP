@@ -20,12 +20,15 @@ Complete and commit each item before starting the next item.
   Switching configurations restores the baseline with zero recompilations. A missing library correctly blocks the dependency probe.
   Native cleanup is limited to generated outputs. Legacy selection paths were inspected, not executed.
   Item 2 is complete after recovery.
-- Item 3: Complete. Portable FFI and callback tests pass using configuration-local fixture output.
+- Item 3: `dfae72a`. Complete. Portable FFI and callback tests pass using configuration-local fixture output.
   Intentional assertion failures and legacy errors with exit zero both produce a failing driver status.
   Corrected fixture C prototypes to match their declared FFI types.
-- Item 4 and items 6–14: Pending.
+- Item 4: Complete. ASan reproduces the old return-buffer overflow; the corrected FFI suite passes under ASan.
+  Return storage meets the prepared size, register-size minimum, and alignment.
+  The argument vector now follows the prepared count. Regressions cover 24-byte returns and 20 arguments.
+- Items 6–14: Pending.
 
 One baseline setup command used a Python tar option unavailable in the installed Python.
 The corrected extraction command succeeded. The baseline compilation failure is a recorded source defect.
 
-Next action: Commit item 3, then reproduce and fix FFI result storage (item 4).
+Next action: Commit item 4, then audit fixed and variadic ABI behavior (item 6).

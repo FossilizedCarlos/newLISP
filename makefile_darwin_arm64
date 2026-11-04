@@ -46,3 +46,4 @@ $(BUILD_DIR)/ffitest.dylib: util/ffitest.c util/arm64-callback.c $(BUILD_DIR)/de
 ffi-check: all $(BUILD_DIR)/ffitest.dylib
 	NEWLISP_TEST_LIBRARY='$(abspath $(BUILD_DIR)/ffitest.dylib)' sh build-support/run-qa.sh ./newlisp qa-specific-tests/qa-libffi $(BUILD_DIR)/qa-libffi.log
 	NEWLISP_TEST_LIBRARY='$(abspath $(BUILD_DIR)/ffitest.dylib)' sh build-support/run-qa.sh ./newlisp qa-specific-tests/qa-arm64-callback $(BUILD_DIR)/qa-arm64-callback.log
+	NEWLISP_TEST_LIBRARY='$(abspath $(BUILD_DIR)/ffitest.dylib)' sh build-support/run-qa.sh ./newlisp qa-specific-tests/qa-ffi-storage $(BUILD_DIR)/qa-ffi-storage.log

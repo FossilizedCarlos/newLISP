@@ -243,3 +243,11 @@ Revised item 2: select an explicit SDK and generate a forwarding include instead
 Make configuration depend on the native makefile. Verify regeneration before rebuilding.
 This prevents stale build rules after source changes. The user authorized documented plan adjustments.
 No runtime behavior or public API changes are added by this recovery.
+
+### 2026-11-04: Include argument-vector storage in item 4
+
+The FFI storage audit found a 16-entry argument vector, although prepared signatures permit 32 arguments.
+Item 4 now sizes this vector from the prepared argument count.
+A 20-argument regression accompanies the large-structure return test.
+ASan reproduced the original return-buffer overflow before the fix.
+The corrected FFI suite, callback fixture, and storage regressions pass under ASan.

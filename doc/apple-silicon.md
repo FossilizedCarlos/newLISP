@@ -44,3 +44,6 @@ make -f makefile_darwin_arm64 ffi-check
 
 The fixture uses the selected compiler, SDK, architecture, and flags. Its library and logs reside in the configuration directory.
 The QA driver rejects nonzero exit status, legacy failure messages, and missing completion markers.
+
+The FFI storage regression covers a 24-byte structure return and a 20-argument call.
+Return storage follows the size, alignment, and register-width requirements in the [libffi calling documentation](https://www.chiark.greenend.org.uk/doc/libffi-dev/html/The-Basics.html).
