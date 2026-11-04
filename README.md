@@ -1,50 +1,41 @@
-newLISP mirror
-==============
+# newLISP Apple Silicon fork
 
-[![Build Status](https://travis-ci.org/kosh04/newlisp.svg?branch=develop)](https://travis-ci.org/kosh04/newlisp)
-[![Build status](https://ci.appveyor.com/api/projects/status/qg6ijtx867q5fxnl/branch/develop?svg=true)](https://ci.appveyor.com/project/kosh04/newlisp/branch/develop)
-[![codecov](https://codecov.io/gh/kosh04/newlisp/branch/develop/graph/badge.svg)](https://codecov.io/gh/kosh04/newlisp)
-[![DebianBadge](https://badges.debian.net/badges/debian/stable/newlisp/version.svg)](https://packages.debian.org/stable/newlisp) <!-- OR https://buildd.debian.org/status/package.php?p=newlisp -->
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/kosh04/newlisp)
+[![Apple Silicon regression](https://github.com/FossilizedCarlos/newLISP/actions/workflows/apple-silicon.yml/badge.svg?branch=apple-silicon)](https://github.com/FossilizedCarlos/newLISP/actions/workflows/apple-silicon.yml)
 
-## newLISP with Git(Hub)
+This unofficial fork maintains newLISP 10.7.5 with native Apple Silicon builds and portability fixes.
+The original source distribution is available from [SourceForge](https://sourceforge.net/projects/newlisp/files/).
 
-NOTE: This repository is *unofficial* mirror.
+## Build and test
 
-This is newLISP experimental repository introduced DVCS (Distributed Version Control System) by using Git.
-All source files are fetch from [SourceForge](http://sourceforge.net/projects/newlisp/files/).
-Mainly available to easy browsing source code, view history, create a patch, etc.
+On an ARM64 Mac with Apple command-line tools installed:
 
-The final goal is newLISP development introduces DVCS (Git, Mercurial, etc) in official.
+```sh
+make
+make -f makefile_darwin_arm64 core-check embedding-check
+```
 
-### branch
+See [Apple Silicon build instructions](doc/apple-silicon.md) for dependencies, sanitizer modes, and shared-library use.
+See [PLAN.md](PLAN.md) for completed work and remaining tasks.
 
-- `master`  : mirror from original newlisp sources
-- `develop` : `master` files and `README.md`, `.travis.yml`, `appveyor.yml` (default branch)
-- `feature/xxx` : (reserved)
+## Repository
 
-### features
+- [Source and branches](https://github.com/FossilizedCarlos/newLISP): `apple-silicon` is the default development branch.
+- [GitHub Actions](https://github.com/FossilizedCarlos/newLISP/actions/workflows/apple-silicon.yml): native ARM64 build and regression checks.
+- [Issues](https://github.com/FossilizedCarlos/newLISP/issues): bug reports and feature requests for this fork.
+- [Pull requests](https://github.com/FossilizedCarlos/newLISP/pulls): proposed changes to this fork.
+- [Releases](https://github.com/FossilizedCarlos/newLISP/releases): published releases, when available.
 
-- [Source Archives](https://github.com/kosh04/newlisp/releases)
-- [Travis CI](https://travis-ci.org/kosh04/newlisp) : Continuous Integration
-- [AppVeyor](https://ci.appveyor.com/project/kosh04) : Continuous Integration (for Windows)
-- [Codecov](https://codecov.io/gh/kosh04/newlisp) : Code Coverage
-- [Gitter](https://gitter.im/kosh04/newlisp) : Chat about this repo
+The `master` and `develop` branches retain the imported repository history.
+The inherited Travis CI and AppVeyor configuration files remain in the source tree.
+This fork does not advertise upstream Travis CI, AppVeyor, Codecov, or Gitter integrations as its own.
 
-## Contribute
+## Upstream resources
 
-Issue and pull requests about this repository are welcome.
-
-For code contributions, bug fixes, reports and comments,
-please contact Lutz Mueller (see README) or post to the Forum.
-
-## Link
-
-- newLISP http://www.newlisp.org/
-- newLISP Forum http://www.newlispfanclub.alh.net/
+- [newLISP](http://www.newlisp.org/)
+- [newLISP Forum](http://www.newlispfanclub.alh.net/)
+- [Debian stable package](https://packages.debian.org/stable/newlisp): the distribution package, not a build of this fork.
 
 ## License
 
 newLISP and Nuevatec are trademarks of Lutz Mueller.
-All files are distribute by GPLv3. For more details,
-see [doc/COPYING](https://github.com/kosh04/newlisp/blob/master/doc/COPYING) and [doc/License.html](https://rawgit.com/kosh04/newlisp/master/doc/License.html).
+See [COPYING](doc/COPYING) and [license information](doc/License.html) for the license terms.

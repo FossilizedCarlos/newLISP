@@ -18,7 +18,7 @@ Item 11 is configured locally and awaits hosted verification. Items 12–14 rema
 I will run `make` and inspect its output under the approved plan. You do not need to run it yourself.
 I will also run the regression tests, sanitizer builds, and benchmarks described below.
 I will request approval before installing software. Missing dependencies will be reported with the required package and purpose.
-I will not run installation targets or publish changes as part of this plan.
+I will not run installation targets. The user subsequently approved publishing the `apple-silicon` branch to verify CI.
 
 The current machine reports ARM64 and Apple Clang 21.0.0 through `xcrun`.
 Homebrew is available. `pkg-config` was not found on the current PATH.
@@ -315,3 +315,11 @@ Its YAML checks and extracted baseline script pass locally. The other matrix com
 No packages were installed or added to the workflow.
 A hosted run cannot execute until the branch is published. This plan currently excludes publishing changes.
 Item 11 remains incomplete pending publication approval and observed GitHub results. Items 12–14 remain pending.
+
+### 2026-11-04: Publication and fork-specific README links approved
+
+The user approved publishing `apple-silicon` to verify item 11 and requested badges for this repository.
+The README uses this fork's GitHub Actions badge and branch. Other repository links now target this fork.
+Upstream service badges are removed; no service account or project identifier is invented.
+The Debian package is retained as a labelled upstream link.
+This authorization supersedes the earlier restriction on branch publication.

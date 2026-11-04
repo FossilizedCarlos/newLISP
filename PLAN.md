@@ -158,7 +158,7 @@ The matrix covers baseline, debug, ASan, and UBSan; each runs core QA and embedd
 It verifies binary architecture, retains logs for seven days, and installs no packages.
 YAML syntax, trigger structure, matrix values, and pinned action references pass local checks.
 The workflow's extracted baseline shell script passes locally. Other matrix commands passed during item 10.
-A hosted run is not yet verified. The plan excludes publishing, so branch publication requires user approval.
+A hosted run is not yet verified. The user approved publishing `apple-silicon` and requested fork-specific README badges.
 Do not mark this item complete or start item 12 until hosted verification is resolved.
 
 Select an available native ARM64 runner after checking repository access, runner availability, and cost.
@@ -243,4 +243,13 @@ Review logs are in `/tmp/newlisp-opus-review/` and are local temporary artifacts
 These results do not cover other architectures or tests outside the core suite.
 
 The review updates documentation only. The agent instruction file remains unchanged.
-Next action: Obtain approval to publish `apple-silicon`, then observe and verify the item 11 hosted workflow.
+Next action: Publish `apple-silicon`, then observe and verify the item 11 hosted workflow.
+
+## README badge update
+
+The user requested badge links for this fork before publication.
+The README now links its build badge to this repository's Apple Silicon workflow and branch.
+Repository, issues, pull requests, releases, and license links point to this fork.
+Inherited upstream service badges are removed instead of assigning unverified service identifiers.
+The Debian package remains a labelled upstream resource, not a fork build badge.
+Verification: Markdown whitespace checks, local link targets, and owner/branch checks.
