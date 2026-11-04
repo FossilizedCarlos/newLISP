@@ -4016,9 +4016,9 @@ if(cell->type == CELL_LONG)
 else if(cell->type == CELL_FLOAT)
     {
     if(isnan(*(double *)&cell->contents)) *number = 0;
-    else if(*(double *)&cell->contents >  9223372036854775807.0) *number = 0x7FFFFFFFFFFFFFFFLL;
+    else if(*(double *)&cell->contents >= 9223372036854775808.0) *number = 0x7FFFFFFFFFFFFFFFLL;
     else if(*(double *)&cell->contents < -9223372036854775808.0) *number = 0x8000000000000000LL;
-    else *number = *(double *)&cell->contents;
+    else *number = (INT64)*(double *)&cell->contents;
     }
 #endif
 else
@@ -4061,7 +4061,7 @@ else if(cell->type == CELL_LONG)
 else if(cell->type == CELL_FLOAT)
     {
     if(isnan(*(double *)&cell->aux)) *number = 0; 
-    else if(*(double *)&cell->aux >  9223372036854775807.0) *number = 0x7FFFFFFFFFFFFFFFLL;
+    else if(*(double *)&cell->aux >= 9223372036854775808.0) *number = 0x7FFFFFFFFFFFFFFFLL;
     else if(*(double *)&cell->aux < -9223372036854775808.0) *number = 0x8000000000000000LL;
     else *number = *(double *)&cell->aux;
     }
@@ -4096,9 +4096,9 @@ if(cell->type == CELL_LONG)
 else if(cell->type == CELL_FLOAT)
     {
     if(isnan(*(double *)&cell->contents)) *number = 0;
-    else if(*(double *)&cell->contents >  9223372036854775807.0) *number = 0x7FFFFFFFFFFFFFFFLL;
+    else if(*(double *)&cell->contents >= 9223372036854775808.0) *number = 0x7FFFFFFFFFFFFFFFLL;
     else if(*(double *)&cell->contents < -9223372036854775808.0) *number = 0x8000000000000000LL;
-    else *number = *(double *)&cell->contents;
+    else *number = (INT64)*(double *)&cell->contents;
     }
 else
     {
@@ -4154,9 +4154,9 @@ if(cell->type == CELL_LONG)
 else if(cell->type == CELL_FLOAT)
     {
     if(isnan(*(double *)&cell->contents)) *number = 0;
-    else if(*(double *)&cell->contents >  9223372036854775807.0) *number = 0x7FFFFFFFFFFFFFFFLL;
+    else if(*(double *)&cell->contents >= 9223372036854775808.0) *number = 0x7FFFFFFFFFFFFFFFLL;
     else if(*(double *)&cell->contents < -9223372036854775808.0) *number = 0x8000000000000000LL;
-    else *number = *(double *)&cell->contents;
+    else *number = (INT64)*(double *)&cell->contents;
     }
 #endif
 else /* if BIGNUM type throw ERR_NUMBER_OUT_OF_RANGE */

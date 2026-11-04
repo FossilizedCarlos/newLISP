@@ -81,6 +81,26 @@ printf("\n");
 }
 #endif
 
+/* Preserve the signed interpretation of wrapping 64-bit arithmetic. */
+static INT64 integerBits(uint64_t bits)
+{
+INT64 result;
+memcpy(&result, &bits, sizeof(result));
+return result;
+}
+
+static INT64 shiftInteger(INT64 value, INT64 count, int left)
+{
+uint64_t bits = (uint64_t)value;
+if(count < 0 || count >= 64)
+    {
+    errorProc(ERR_NUMBER_OUT_OF_RANGE);
+    return 0;
+    }
+if(left) return integerBits(bits << count);
+return integerBits(value < 0 ? ~(~bits >> count) : bits >> count);
+}
+
 CELL * p_abs(CELL * params) 
 {  
 CELL * cell;
@@ -109,7 +129,7 @@ if(cell->type == CELL_FLOAT)
     }
 
 getInteger64Ext(cell, &intValue, FALSE);
-if(intValue < 0) intValue = intValue * -1;
+if(intValue < 0) intValue = integerBits(0 - (uint64_t)intValue);
 
 return(stuffInteger64(intValue));
 }
@@ -183,10 +203,10 @@ if(params->next != nilCell)
 
 #ifndef NEWLISP64
 cell->type = CELL_INT64;
-*(INT64 *)&cell->aux = lValue + adjust * type;
+*(INT64 *)&cell->aux = integerBits((uint64_t)lValue + (uint64_t)adjust * (uint64_t)type);
 #else
 cell->type = CELL_LONG;
-cell->contents = lValue + adjust * type;
+cell->contents = integerBits((uint64_t)lValue + (uint64_t)adjust * (uint64_t)type);
 #endif
 
 return(copyCell(cell));
@@ -348,13 +368,13 @@ if(params == nilCell)
     switch(op)
         {
         case OP_SUBTRACT:
-            result = - result;
+            result = integerBits(0 - (uint64_t)result);
             break;
         case OP_SHIFTL:
-            result <<= 1;
+            result = shiftInteger(result, 1, TRUE);
             break;
         case OP_SHIFTR:
-            result >>= 1;
+            result = shiftInteger(result, 1, FALSE);
         default:
             break;
         }
@@ -365,20 +385,24 @@ else while(params != nilCell)
     params = getInteger64Ext(params, &number, TRUE);
     switch(op)
         {
-        case OP_ADD:            result += number; break;
-        case OP_SUBTRACT:       result -= number; break;
-        case OP_MULTIPLY:       result *= number; break;
+        case OP_ADD:            result = integerBits((uint64_t)result + (uint64_t)number); break;
+        case OP_SUBTRACT:       result = integerBits((uint64_t)result - (uint64_t)number); break;
+        case OP_MULTIPLY:       result = integerBits((uint64_t)result * (uint64_t)number); break;
         case OP_DIVIDE:         
             if(number == 0) return(errorProc(ERR_MATH));
-                                result /= number; break;
+                                if(!(result == (-MY_INT64_MAX - 1) && number == -1))
+                                    result /= number;
+                                break;
         case OP_BIT_OR:         result |= number; break;
         case OP_BIT_AND:        result &= number; break;
         case OP_BIT_XOR:        result ^= number; break;
-        case OP_SHIFTL:         result <<= number; break;
-        case OP_SHIFTR:         result >>= number; break;
+        case OP_SHIFTL:         result = shiftInteger(result, number, TRUE); break;
+        case OP_SHIFTR:         result = shiftInteger(result, number, FALSE); break;
         case OP_MODULO:
             if(number == 0) return(errorProc(ERR_MATH));
-            result %= number; break;
+            if(result == (-MY_INT64_MAX - 1) && number == -1) result = 0;
+            else result %= number;
+            break;
         default:
             break;
         }

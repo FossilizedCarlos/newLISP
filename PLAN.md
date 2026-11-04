@@ -31,13 +31,16 @@ Complete and commit each item before starting the next item.
   The complete FFI fixtures pass normally and under ASan. The libc variadic test passes with its declared boundary.
   Added its missing completion marker after the QA driver correctly rejected incomplete success reporting.
   Unknown native signatures cannot be introspected; caller obligations and unsupported aggregate callback returns are documented.
-- Item 7: Complete. Named debug, ASan, and UBSan modes compile and link with separate configuration directories.
+- Item 7: `84c5e8e`. Complete. Named debug, ASan, and UBSan modes compile and link with separate configuration directories.
   Debug core QA passes. The QA driver detects intentional failures and existing sanitizer faults.
   UBSan finds signed overflow in `nl-math.c:368`; ASan finds a read underflow in `nl-filesys.c:666`.
   These defects block clean sanitizer suites and are assigned to items 8 and 9.
-- Items 8–14: Pending.
+- Item 8: Complete. Integer boundaries, float behavior, and 10,000-case bigint QA pass under UBSan.
+  Defined wrapping arithmetic, validated shift counts, handled minimum/-1 division, and corrected float saturation.
+  The wider UBSan suite proceeds past arithmetic and stops at the known item 9 line-reading fault.
+- Items 9–14: Pending.
 
 One baseline setup command used a Python tar option unavailable in the installed Python.
 The corrected extraction command succeeded. The baseline compilation failure is a recorded source defect.
 
-Next action: Commit item 7, then reproduce and correct integer boundary behavior (item 8).
+Next action: Commit item 8, then fix reproduced memory portability faults (item 9).

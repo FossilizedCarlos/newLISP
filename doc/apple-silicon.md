@@ -96,3 +96,16 @@ Initial sanitizer findings:
 
 These are source defects, not passing checks. Items 8 and 9 address them.
 A temporary deliberate heap overflow confirmed that ASan reports a fault and returns a failing status.
+
+## Integer boundaries
+
+Fixed-width addition, subtraction, multiplication, negation, and increment/decrement use explicit unsigned arithmetic for wrapping results.
+The minimum signed integer remains unchanged when negated or divided by `-1`; its remainder modulo `-1` is zero.
+Its fixed-width absolute value also wraps to the same bit pattern.
+Shift counts must be between 0 and 63. Other counts produce a range error, consistent with the documented valid range.
+Right shift explicitly extends the sign bit.
+Floating conversion saturates at the representable signed bounds, including the rounded upper-bound double.
+NaN conversion remains zero.
+
+The integer boundary, floating, and 10,000-case bigint tests pass under UBSan.
+The full UBSan run then reaches the separately tracked line-reading defect.
