@@ -1,7 +1,7 @@
 # Apple Silicon implementation status
 
 Status: Approved on 2026-11-04. Items 1–10, including 9a and 9b, are complete.
-Items 11–14 remain pending. The current review confirms passing baseline, debug, ASan, and UBSan core QA.
+Item 11 is configured locally and awaits hosted verification. Items 12–14 remain pending. The current review confirms passing baseline, debug, ASan, and UBSan core QA.
 Earlier failures below describe the state at each commit, not the current test results.
 
 The [detailed plan](Updating%20newLISP%20for%20Apple%20Silicon.md) defines each item and its verification.
@@ -127,7 +127,7 @@ Two before/after checks were affected and repeated after deleting the generated 
 
 ### Item 10 — Validate shared-library loading and embedding
 
-**Status:** Complete. Commit recorded after this item is committed.
+**Status:** Complete. **Commit:** `025cb5e`.
 
 The ARM64 dynamic library uses separate library objects and an `@rpath` install name.
 The C host and newLISP loader verify initialization, evaluation, UTF-8, persistent state, error recovery, and callbacks.
@@ -150,7 +150,16 @@ Complete and commit each item before starting the next item.
 
 ### Item 11 — Add native ARM64 continuous integration
 
-**Status:** Pending.
+**Status:** Configured locally; hosted verification pending.
+
+The workflow is `.github/workflows/apple-silicon.yml`. It selects the standard ARM64 `macos-15` runner.
+Repository metadata confirms a public, active repository with `apple-silicon` as its default branch.
+The matrix covers baseline, debug, ASan, and UBSan; each runs core QA and embedding checks.
+It verifies binary architecture, retains logs for seven days, and installs no packages.
+YAML syntax, trigger structure, matrix values, and pinned action references pass local checks.
+The workflow's extracted baseline shell script passes locally. Other matrix commands passed during item 10.
+A hosted run is not yet verified. The plan excludes publishing, so branch publication requires user approval.
+Do not mark this item complete or start item 12 until hosted verification is resolved.
 
 Select an available native ARM64 runner after checking repository access, runner availability, and cost.
 Configure correctness and sanitizer jobs with preserved logs and test reports.
@@ -234,4 +243,4 @@ Review logs are in `/tmp/newlisp-opus-review/` and are local temporary artifacts
 These results do not cover other architectures or tests outside the core suite.
 
 The review updates documentation only. The agent instruction file remains unchanged.
-Next implementation item: native ARM64 continuous integration (item 11).
+Next action: Obtain approval to publish `apple-silicon`, then observe and verify the item 11 hosted workflow.

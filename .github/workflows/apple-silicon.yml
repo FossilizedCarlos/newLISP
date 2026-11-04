@@ -1,0 +1,64 @@
+name: Apple Silicon regression
+
+"on":
+  push:
+    branches: [apple-silicon]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: apple-silicon-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native:
+    name: ARM64 ${{ matrix.mode }}
+    runs-on: macos-15
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [baseline, debug, asan, ubsan]
+    env:
+      BUILD_MODE: ${{ matrix.mode }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Record native toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/ci
+          {
+            test "$(uname -m)" = arm64
+            uname -m
+            sw_vers
+            xcrun clang --version
+            xcrun --sdk macosx --show-sdk-path
+          } 2>&1 | tee build/ci/environment.log
+      - name: Build and test
+        shell: bash
+        run: |
+          set -euo pipefail
+          unset NEWLISPLIB_INIT
+          make -f makefile_darwin_arm64 core-check embedding-check MODE="$BUILD_MODE" 2>&1 | tee build/ci/build.log
+          {
+            test "$(lipo -archs newlisp)" = arm64
+            test "$(lipo -archs newlisp.dylib)" = arm64
+            file newlisp newlisp.dylib
+            otool -L newlisp
+            otool -L newlisp.dylib
+          } 2>&1 | tee build/ci/artifacts.log
+      - name: Preserve build and test logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: apple-silicon-${{ matrix.mode }}-logs
+          path: build/**/*.log
+          if-no-files-found: warn
+          retention-days: 7

@@ -13,7 +13,7 @@ tags:
 The user approved implementation on 2026-11-04. Items 1–10, including additions 9a and 9b, are complete.
 The initial compilation and sanitizer failures are resolved in the tested core suite.
 A review after the Opus handoff confirms passing forced builds in baseline, debug, ASan, and UBSan modes.
-Items 11–14 remain pending. Native ARM64 continuous integration is next.
+Item 11 is configured locally and awaits hosted verification. Items 12–14 remain pending.
 
 I will run `make` and inspect its output under the approved plan. You do not need to run it yourself.
 I will also run the regression tests, sanitizer builds, and benchmarks described below.
@@ -307,3 +307,11 @@ The native shared library and both embedding fixtures pass in baseline, debug, A
 The existing API has no shutdown entry point. Verification therefore covers process-lifetime loading and normal host exit.
 Safe unload/reload and concurrent evaluation are not claimed. No new shutdown API is introduced.
 The initial UTF-8 fixture used byte-counting `length`; changing it to `utf8len` corrected the test expectation.
+
+### 2026-11-04: Hosted verification requires branch publication
+
+Item 11 now has a native ARM64 workflow with baseline, debug, ASan, and UBSan jobs.
+Its YAML checks and extracted baseline script pass locally. The other matrix commands pass during item 10.
+No packages were installed or added to the workflow.
+A hosted run cannot execute until the branch is published. This plan currently excludes publishing changes.
+Item 11 remains incomplete pending publication approval and observed GitHub results. Items 12–14 remain pending.

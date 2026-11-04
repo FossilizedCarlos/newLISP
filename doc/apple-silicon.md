@@ -153,3 +153,19 @@ Both tests pass in baseline, debug, ASan, and UBSan modes. Core QA also passes i
 The existing API has no shutdown entry point and does not promise safe unload/reload or concurrent access.
 Keep the library loaded until process exit. Do not evaluate `(exit)` as an embedding cleanup operation.
 The tests clear `NEWLISPLIB_INIT` so local startup files cannot alter their results.
+
+## Native continuous integration
+
+The workflow `.github/workflows/apple-silicon.yml` runs on pushes to `apple-silicon`, pull requests, and manual dispatch.
+It selects `macos-15` and checks `uname -m` before building.
+GitHub documents this label as a standard ARM64 runner in its [runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
+The repository is public. Standard runner compute is free for public repositories under [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
+
+The matrix covers baseline, debug, ASan, and UBSan. Each job runs core QA and both embedding fixtures.
+Build and test logs are retained for seven days. Actions are pinned to commit IDs.
+The workflow uses installed SDK dependencies and contains no package installation commands.
+
+Local YAML checks and the extracted baseline job script pass.
+The debug and sanitizer commands also pass locally as recorded in item 10.
+A hosted run has not occurred. Publishing the branch is required before GitHub can execute the workflow.
+Repository Actions policy and hosted execution remain unverified until that run.
