@@ -13,16 +13,19 @@ Complete and commit each item before starting the next item.
   Its first test script used unsupported `(env name nil)`; changing the test to an empty value resolves that harness error.
   Published callbacks retain interpreter lifetime. Cleanup releases unpublished closure allocations on failure.
   Sanitizer verification follows in item 7. Other platforms were not executed.
-- Item 2: In progress. Two builds failed: missing explicit SDK, then stale copied build rules.
+- Item 2: `5695445`. Complete. Two builds failed: missing explicit SDK, then stale copied build rules.
   Build attempts stopped for review. Revised configuration uses a forwarding include and explicit SDK.
   Recovery succeeded. `make`, explicit `make arm64`, compiler/flag overrides, and `qa-dot` pass.
   `file`, `lipo`, and `otool` confirm ARM64 and SDK libraries. Feature reporting includes UTF-8 and libffi.
   Switching configurations restores the baseline with zero recompilations. A missing library correctly blocks the dependency probe.
   Native cleanup is limited to generated outputs. Legacy selection paths were inspected, not executed.
   Item 2 is complete after recovery.
-- Items 3–4 and 6–14: Pending.
+- Item 3: Complete. Portable FFI and callback tests pass using configuration-local fixture output.
+  Intentional assertion failures and legacy errors with exit zero both produce a failing driver status.
+  Corrected fixture C prototypes to match their declared FFI types.
+- Item 4 and items 6–14: Pending.
 
 One baseline setup command used a Python tar option unavailable in the installed Python.
 The corrected extraction command succeeded. The baseline compilation failure is a recorded source defect.
 
-Next action: Commit item 2, then add portable FFI regression fixtures (item 3).
+Next action: Commit item 3, then reproduce and fix FFI result storage (item 4).

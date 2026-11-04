@@ -35,3 +35,12 @@ otool -L newlisp
 ./newlisp -v
 ./newlisp qa-dot
 ```
+
+Run portable FFI and callback fixtures with:
+
+```sh
+make -f makefile_darwin_arm64 ffi-check
+```
+
+The fixture uses the selected compiler, SDK, architecture, and flags. Its library and logs reside in the configuration directory.
+The QA driver rejects nonzero exit status, legacy failure messages, and missing completion markers.

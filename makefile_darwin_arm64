@@ -38,3 +38,11 @@ clean:
 	rm -rf build/arm64
 
 -include $(OBJECTS:.o=.d)
+
+.PHONY: ffi-check
+$(BUILD_DIR)/ffitest.dylib: util/ffitest.c util/arm64-callback.c $(BUILD_DIR)/deps.mk
+	$(CC) $(CPPFLAGS) $(DEP_CPPFLAGS) $(CFLAGS) -isysroot "$(SDKROOT)" -arch arm64 -dynamiclib util/ffitest.c util/arm64-callback.c $(LDFLAGS) -o $@
+
+ffi-check: all $(BUILD_DIR)/ffitest.dylib
+	NEWLISP_TEST_LIBRARY='$(abspath $(BUILD_DIR)/ffitest.dylib)' sh build-support/run-qa.sh ./newlisp qa-specific-tests/qa-libffi $(BUILD_DIR)/qa-libffi.log
+	NEWLISP_TEST_LIBRARY='$(abspath $(BUILD_DIR)/ffitest.dylib)' sh build-support/run-qa.sh ./newlisp qa-specific-tests/qa-arm64-callback $(BUILD_DIR)/qa-arm64-callback.log

@@ -46,17 +46,17 @@ char ret_sint8(char number)
     return(number);
     }
 
-char ret_uint8(unsigned char number)
+unsigned char ret_uint8(unsigned char number)
     {
     return(number);
     }
 
-short int ret_sint16(int number)
+short int ret_sint16(short int number)
     {
     return(number);
     }
 
-short int ret_uint16(unsigned int number)
+unsigned short int ret_uint16(unsigned short int number)
     {
     return(number);
     }
@@ -119,7 +119,7 @@ void register_callback(void * ptr)
     function = ptr;
     }
 
-void trigger_callback()
+void trigger_callback(void)
     {
     double dnum = 12345.67890;
 
@@ -135,7 +135,7 @@ void register_callback_simple(void * ptr)
     function_simple = ptr;
     }
 
-void trigger_callback_simple() /* only handles strings and integers */
+void trigger_callback_simple(void) /* only handles strings and integers */
     {
     long inum = 1234567890;
 
