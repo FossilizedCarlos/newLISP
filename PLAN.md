@@ -35,12 +35,40 @@ Complete and commit each item before starting the next item.
   Debug core QA passes. The QA driver detects intentional failures and existing sanitizer faults.
   UBSan finds signed overflow in `nl-math.c:368`; ASan finds a read underflow in `nl-filesys.c:666`.
   These defects block clean sanitizer suites and are assigned to items 8 and 9.
-- Item 8: Complete. Integer boundaries, float behavior, and 10,000-case bigint QA pass under UBSan.
+- Item 8: `ca16571`. Complete. Integer boundaries, float behavior, and 10,000-case bigint QA pass under UBSan.
   Defined wrapping arithmetic, validated shift counts, handled minimum/-1 division, and corrected float saturation.
   The wider UBSan suite proceeds past arithmetic and stops at the known item 9 line-reading fault.
-- Items 9–14: Pending.
+- Item 9: Complete. ASan reproduces `read-line` index -1 reads for an empty line and a leading NUL byte.
+  Both bounds are checked before the newline and carriage-return tests. NUL truncation behavior is unchanged.
+  With that fix, ASan reaches a `t-test` overread in `qa-dot` when the first sample is longer.
+  The cross-product loop is bounded by both sample lengths; it is used only for equal-length dependent samples.
+  Each regression fails under ASan before its fix and passes after it.
+  Debug and UBSan core QA pass. ASan core QA passes through `qa-dot` and stops at the XML parser (item 9a).
+  ASan also finds a bigint division fault in `qa-longnum` and `qa-bigint` (item 9b).
+- Items 9a and 9b: Proposed. Awaiting approval. See below.
+- Items 10–14: Pending.
 
 One baseline setup command used a Python tar option unavailable in the installed Python.
 The corrected extraction command succeeded. The baseline compilation failure is a recorded source defect.
 
-Next action: Commit item 8, then fix reproduced memory portability faults (item 9).
+## Proposed items (awaiting approval)
+
+Item 9 permits independent faults only as new plan items. ASan found two:
+
+- 9a. Bound XML parser reads. `nl-xml-json.c` uses `memcmp` against the parse position (lines 222, 230, 370, 381),
+  reads 3 bytes of a 2-byte close-tag literal (356), and reads `source[closeTag - 1]` before the not-found check (354).
+  Reproduced: `(xml-parse "<a/>")`, `(xml-parse "<a")`, and `(xml-parse "<!--x")` abort under ASan; `qa-xml` aborts.
+  Proposed fix: bounded string comparisons and the not-found check before the read. Proof: focused regression and `qa-xml` under ASan.
+- 9b. Size bigint quotient storage. `divModBigint` writes `q[++sq]` beyond its `nx - ny + 1` entry `alloca` (`nl-math.c:4266`).
+  Reproduced by `qa-longnum` and `qa-bigint` under ASan. The quotient digit count needs analysis before a fix.
+  Proof: smallest failing division as a regression, 10,000-case bigint QA under ASan and UBSan.
+
+## Benchmark workloads (item 12)
+
+User decision on 2026-11-04: use synthetic benchmarks. No real user programs are available yet.
+The archived newlisp.org Docs page lists manuals, translations, videos, and one script (`gc.txt`).
+`gc.txt` counts Google search hits over the network and is not a repeatable benchmark.
+Code Patterns and the manual are already in `doc/`; their examples may supply synthetic workload shapes.
+Report all benchmark results as synthetic.
+
+Next action: Commit item 9, then obtain approval for items 9a and 9b.

@@ -660,10 +660,10 @@ while((chr = fgetc(inStream)) != EOF)
 while(fgets(buff, MAX_STRING, inStream) != NULL)
     {
     l=strlen(buff);
-    if(buff[l-1] == 0x0A)
+    if(l > 0 && buff[l-1] == 0x0A)
         {
         buff[--l] = 0;
-        if(buff[l-1] == 0x0D)
+        if(l > 0 && buff[l-1] == 0x0D)
             buff[--l] = 0;
         writeStreamStr(stream, buff, l);
         break;

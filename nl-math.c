@@ -3723,7 +3723,7 @@ if((Y = getVector(evaluateExpression(params), &Ny, &sumy, &meany, &sd2y)) == NUL
     return(errorProc(ERR_LIST_OR_ARRAY_EXPECTED));
 
 sumxy = 0.0;
-for(idx = 0; idx < Nx; idx++)
+for(idx = 0; idx < Nx && idx < Ny; idx++)
     sumxy += X[idx] * Y[idx];
 
 freeMemory(X);
