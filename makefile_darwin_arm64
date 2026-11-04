@@ -65,3 +65,27 @@ CORE_QA := qa-specific-tests/qa-integer-boundaries qa-specific-tests/qa-read-lin
 core-check: ffi-check
 	@set -e; for test in $(CORE_QA); do 	  sh build-support/run-qa.sh ./newlisp $$test $(BUILD_DIR)/$$(basename $$test).log; 	done
 	sh build-support/run-qa.sh ./newlisp qa-specific-tests/qa-bigint $(BUILD_DIR)/qa-bigint.log 10000
+
+# Library objects must not reuse executable objects compiled without LIBRARY.
+LIB_SOURCES := $(SOURCES) unix-lib.c
+LIB_OBJECTS := $(LIB_SOURCES:%.c=$(BUILD_DIR)/lib/%.o)
+LIBRARY := $(BUILD_DIR)/newlisp.dylib
+.PHONY: shared embedding-check
+shared: $(LIBRARY)
+	cp $(LIBRARY) newlisp.dylib
+
+$(BUILD_DIR)/lib/%.o: %.c makefile_darwin_arm64 $(BUILD_DIR)/deps.mk
+	@mkdir -p $(BUILD_DIR)/lib
+	$(CC) $(CPPFLAGS) $(DEP_CPPFLAGS) $(REQUIRED_CPPFLAGS) -DLIBRARY $(CFLAGS) $(MODE_FLAGS) -fPIC -Wall -isysroot "$(SDKROOT)" -arch arm64 -MMD -MP -c $< -o $@
+
+$(LIBRARY): $(LIB_OBJECTS)
+	$(CC) $(CFLAGS) $(MODE_FLAGS) $(LIB_OBJECTS) $(LDFLAGS) $(DEP_LDFLAGS) -isysroot "$(SDKROOT)" -arch arm64 -dynamiclib -Wl,-install_name,@rpath/newlisp.dylib $(LDLIBS) -lm -lreadline -lffi -o $@
+
+$(BUILD_DIR)/embedding-test: util/embedding-test.c $(BUILD_DIR)/deps.mk
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(MODE_FLAGS) -isysroot "$(SDKROOT)" -arch arm64 $< $(LDFLAGS) $(LDLIBS) -o $@
+
+embedding-check: all shared $(BUILD_DIR)/embedding-test
+	@unset NEWLISPLIB_INIT; $(BUILD_DIR)/embedding-test '$(abspath $(LIBRARY))' > $(BUILD_DIR)/embedding-test.log 2>&1; status=$$?; cat $(BUILD_DIR)/embedding-test.log; exit $$status
+	unset NEWLISPLIB_INIT; NEWLISP_EMBED_LIBRARY='$(abspath $(LIBRARY))' sh build-support/run-qa.sh ./newlisp qa-specific-tests/qa-embedding $(BUILD_DIR)/qa-embedding.log
+
+-include $(LIB_OBJECTS:.o=.d)

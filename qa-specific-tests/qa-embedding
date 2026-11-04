@@ -1,0 +1,15 @@
+#!/usr/bin/env newlisp
+; Loading the library must keep its interpreter state separate from this process.
+(import (env "NEWLISP_EMBED_LIBRARY") "newlispEvalStr" "char*" "char*")
+(define (check value label)
+    (unless value (println "FAIL: " label) (exit 1)))
+(set 'embedding-counter 99)
+(check (= (newlispEvalStr "(+ 20 22)") "42\n") "evaluation")
+(check (= (newlispEvalStr "(set 'embedding-counter 7)") "7\n") "library state")
+(check (= embedding-counter 99) "host state isolation")
+(check (= (newlispEvalStr "embedding-counter") "7\n") "persistent library state")
+(check (= (newlispEvalStr "(utf8len \"λ\")") "1\n") "library UTF-8")
+(check (find "ERR:" (newlispEvalStr "(/ 1 0)")) "error return")
+(check (= (newlispEvalStr "(+ 3 4)") "7\n") "recovery after error")
+(println ">>>>> library loading SUCCESSFUL")
+(exit 0)

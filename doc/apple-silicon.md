@@ -128,3 +128,28 @@ Apple's GNU Make 3.81 compares whole-second timestamps.
 After editing a source file within one second of a build, delete its object in `build/` before rebuilding.
 Alternatively, use `make -B -f makefile_darwin_arm64 core-check MODE=asan` to force a rebuild.
 The handoff review used forced rebuilds in all four modes and confirmed passing core QA.
+
+## Shared library and embedding
+
+Build and verify the shared library with:
+
+```sh
+make -f makefile_darwin_arm64 shared
+make -f makefile_darwin_arm64 embedding-check
+make -f makefile_darwin_arm64 embedding-check MODE=asan
+make -f makefile_darwin_arm64 embedding-check MODE=ubsan
+```
+
+Library objects reside in a separate `lib/` directory within each build configuration.
+The library uses `-dynamiclib`, ARM64, UTF-8, and libffi. Its install name is `@rpath/newlisp.dylib`.
+The build copies the completed library to `./newlisp.dylib`.
+
+`util/embedding-test.c` loads the library from a C host through `dlopen` and uses the existing exported API.
+It checks lazy initialization, repeated evaluation, persistent state, UTF-8, error recovery, and callbacks into the host.
+`qa-embedding` loads the library from newLISP and verifies that the two interpreter states remain separate.
+Both tests pass in baseline, debug, ASan, and UBSan modes. Core QA also passes in the tested modes.
+
+`newlispEvalStr` returns library-owned text. Copy it before the next evaluation if the host must retain it.
+The existing API has no shutdown entry point and does not promise safe unload/reload or concurrent access.
+Keep the library loaded until process exit. Do not evaluate `(exit)` as an embedding cleanup operation.
+The tests clear `NEWLISPLIB_INIT` so local startup files cannot alter their results.

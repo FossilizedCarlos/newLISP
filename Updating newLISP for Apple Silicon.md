@@ -10,10 +10,10 @@ tags:
 
 ## Status and build responsibility
 
-The user approved implementation on 2026-11-04. Items 1–9, including additions 9a and 9b, are complete.
+The user approved implementation on 2026-11-04. Items 1–10, including additions 9a and 9b, are complete.
 The initial compilation and sanitizer failures are resolved in the tested core suite.
 A review after the Opus handoff confirms passing forced builds in baseline, debug, ASan, and UBSan modes.
-Items 10–14 remain pending. Shared-library loading and embedding are next.
+Items 11–14 remain pending. Native ARM64 continuous integration is next.
 
 I will run `make` and inspect its output under the approved plan. You do not need to run it yourself.
 I will also run the regression tests, sanitizer builds, and benchmarks described below.
@@ -300,3 +300,10 @@ An independent Python reference confirms 300 signed division and remainder cases
 The review reconciles the current status with the historical failure notes and records item 9b as `e99fdd8`.
 Item 12 now states the synthetic-workload decision directly. The earlier dated adjustment remains as history.
 Items 10–14 have not started. This review makes no performance or cross-platform verification claim.
+
+### 2026-11-04: Shared-library lifetime in item 10
+
+The native shared library and both embedding fixtures pass in baseline, debug, ASan, and UBSan modes.
+The existing API has no shutdown entry point. Verification therefore covers process-lifetime loading and normal host exit.
+Safe unload/reload and concurrent evaluation are not claimed. No new shutdown API is introduced.
+The initial UTF-8 fixture used byte-counting `length`; changing it to `utf8len` corrected the test expectation.

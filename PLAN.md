@@ -1,7 +1,7 @@
 # Apple Silicon implementation status
 
-Status: Approved on 2026-11-04. Items 1–9, including 9a and 9b, are complete.
-Items 10–14 remain pending. The current review confirms passing baseline, debug, ASan, and UBSan core QA.
+Status: Approved on 2026-11-04. Items 1–10, including 9a and 9b, are complete.
+Items 11–14 remain pending. The current review confirms passing baseline, debug, ASan, and UBSan core QA.
 Earlier failures below describe the state at each commit, not the current test results.
 
 The [detailed plan](Updating%20newLISP%20for%20Apple%20Silicon.md) defines each item and its verification.
@@ -125,13 +125,16 @@ Default, debug, UBSan, and ASan core QA pass, including 10,000-case bigint QA. N
 Residual risk: GNU Make 3.81 compares whole-second timestamps. An edit in the same second as a build is not recompiled.
 Two before/after checks were affected and repeated after deleting the generated object.
 
-## Pending work
-
-Complete and commit each item before starting the next item.
-
 ### Item 10 — Validate shared-library loading and embedding
 
-**Status:** Pending.
+**Status:** Complete. Commit recorded after this item is committed.
+
+The ARM64 dynamic library uses separate library objects and an `@rpath` install name.
+The C host and newLISP loader verify initialization, evaluation, UTF-8, persistent state, error recovery, and callbacks.
+Baseline, debug, ASan, and UBSan embedding checks pass. Debug and sanitizer core QA also pass after forced rebuilds.
+`file`, `lipo`, and `otool` confirm native ARM64 and expected SDK dependencies.
+The first fixture expected `length` to count characters; it was corrected to use `utf8len`.
+The API has no shutdown entry point. Tests retain the library until process exit; unload/reload is not claimed.
 
 Add the corresponding ARM64 shared-library build with isolated objects and consistent dependency discovery.
 Add a small C embedding fixture and newLISP shared-library loading tests.
@@ -140,6 +143,10 @@ Verify initialization, evaluation, return handling, and shutdown where supported
 **Proof:** Inspect library architecture and dependencies. Run the embedding and loading fixtures natively in normal and sanitizer modes.
 
 **Commit:** `Support native ARM64 embedding and library loading`
+
+## Pending work
+
+Complete and commit each item before starting the next item.
 
 ### Item 11 — Add native ARM64 continuous integration
 
@@ -227,4 +234,4 @@ Review logs are in `/tmp/newlisp-opus-review/` and are local temporary artifacts
 These results do not cover other architectures or tests outside the core suite.
 
 The review updates documentation only. The agent instruction file remains unchanged.
-Next implementation item: shared-library loading and embedding (item 10).
+Next implementation item: native ARM64 continuous integration (item 11).
