@@ -1,4 +1,4 @@
-name: Apple Silicon regression
+name: Apple Silicon build & tests
 
 "on":
   push:

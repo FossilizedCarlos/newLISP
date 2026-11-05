@@ -1,9 +1,13 @@
 # newLISP Apple Silicon fork
 
-[![Apple Silicon regression](https://github.com/FossilizedCarlos/newLISP/actions/workflows/apple-silicon.yml/badge.svg?branch=apple-silicon)](https://github.com/FossilizedCarlos/newLISP/actions/workflows/apple-silicon.yml)
+[![Apple Silicon build & tests](https://github.com/FossilizedCarlos/newLISP/actions/workflows/apple-silicon.yml/badge.svg?branch=apple-silicon)](https://github.com/FossilizedCarlos/newLISP/actions/workflows/apple-silicon.yml)
+![Built with GPT-6 Astra](doc/built-with-gpt-6-astra.svg)
 
-This unofficial fork maintains newLISP 10.7.5 with native Apple Silicon builds and portability fixes.
+This unofficial fork maintains newLISP 10.7.5.1 with native Apple Silicon builds and portability fixes.
 The original source distribution is available from [SourceForge](https://sourceforge.net/projects/newlisp/files/).
+
+The binary release requires macOS 27 or later on Apple Silicon.
+See [release notes](doc/release-10.7.5.1.md) for installation and version details.
 
 ## Build and test
 

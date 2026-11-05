@@ -22,7 +22,8 @@
 # and file LOCALIZATION for details
 #
 
-VERSION = 10.7.5
+VERSION = 10.7.5.1
+# Keep the upstream numeric language version for sys-info compatibility.
 INT_VERSION = 10705
 
 default: makefile_build
@@ -278,8 +279,8 @@ android_dist:
 #
 version:
 	sed -i.bak -E 's/int version = .+;/int version = $(INT_VERSION);/' newlisp.c
-	sed -i.bak -E 's/newLISP v.[[:digit:]]+.[[:digit:]]+.[[:digit:]]+(-dev)? /newLISP v.$(VERSION) /' newlisp.c
-	sed -i.bak -E 's/newLISP\/[[:digit:]]+.[[:digit:]]+.[[:digit:]]+(-dev)?/newLISP\/$(VERSION)/' nl-web.c
+	sed -i.bak -E 's/newLISP v.[[:digit:]]+(\.[[:digit:]]+){2,3}(-dev)? /newLISP v.$(VERSION) /' newlisp.c
+	sed -i.bak -E 's/newLISP\/[[:digit:]]+(\.[[:digit:]]+){2,3}(-dev)?/newLISP\/$(VERSION)/' nl-web.c
 	sed -i.bak -E 's/newLISP v.+ Manual/newLISP v.$(VERSION) Manual/' doc/newlisp_manual.html
 	sed -i.bak -E 's/Reference v.+<\/h2>/Reference v.$(VERSION)<\/h2>/' doc/newlisp_manual.html
 	sed -i.bak -E 's/VERSION=.+/VERSION=$(VERSION)/' configure-alt
