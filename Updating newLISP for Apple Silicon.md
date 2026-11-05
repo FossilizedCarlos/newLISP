@@ -395,3 +395,8 @@ No implementation changes occur in this review. New items await approval and ret
 ### Follow-up item 15 complete
 
 Structure-string arguments are length-checked before copying. Empty, short, exact-size, larger, and embedded-NUL cases pass. Forced baseline, ASan, and UBSan core and embedding suites pass. Raw-pointer storage remains a caller obligation.
+
+
+### Follow-up item 16 complete
+
+FFI preparation now rejects excess arguments and validates trailing declaration tokens. Boundary and variadic-marker regressions use fresh import contexts. Baseline, ASan, and UBSan FFI suites pass. Two initial harness failures were corrected as recorded in the plan.

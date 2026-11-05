@@ -330,7 +330,7 @@ Run FFI and core/embedding checks in baseline, ASan, and UBSan modes.
 
 ### Item 16 — Reject truncated FFI signatures
 
-**Priority:** Medium. **Status:** Proposed; reproduced on the baseline binary.
+**Priority:** Medium. **Status:** Complete; reproduced on the baseline binary.
 
 `ffiPreparation` stops at `MAX_TYPE_ARGS` without rejecting remaining declaration tokens.
 Importing `labs` with 32 `long` arguments followed by `NOT_A_TYPE` succeeds; the invalid trailing token is ignored.
@@ -344,6 +344,8 @@ Keep variadic-marker checks active at the argument limit and preserve supported 
 Verify existing fixed and variadic fixtures under baseline and sanitizers.
 
 **Commit:** `Reject oversized FFI signatures`
+
+**Completion:** FFI preparation now rejects excess arguments and validates trailing declaration tokens. Boundary and variadic-marker regressions use fresh import contexts. Baseline, ASan, and UBSan FFI suites pass. Two initial harness failures were corrected as recorded in the plan.
 
 ### Item 17 — Reject unknown native build modes
 
@@ -375,3 +377,6 @@ Build requests and mixed goals must still reject those profiles.
 Verify ordinary cleanup in an isolated generated-output directory.
 
 **Commit:** `Allow PGO cleanup without profile data`
+
+Item 16 verification adjustment: two harness attempts failed (protected `count`, then cached imports).
+Revised verification uses a fresh context per signature and explicit declarations; native calls are never made with these signatures.

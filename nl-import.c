@@ -958,6 +958,8 @@ CELL * ffiPreparation(CELL * pCell, CELL * params, int type)
             /* skip void arguments */
             if(strcmp((char *)arg->contents,"void") != 0)
                 {
+                if(nargs >= MAX_TYPE_ARGS)
+                    errorProc(ERR_NUM_ARGS);
                 atypes[nargs] = getFFIType((char *) arg->contents);
                 /* C default promotions apply after the variadic boundary. */
                 if(variadic && (atypes[nargs] == &ffi_type_float ||
@@ -971,8 +973,6 @@ CELL * ffiPreparation(CELL * pCell, CELL * params, int type)
             errorProcExt(ERR_INVALID_PARAMETER,pCell);
         params = params->next;
 
-        if(nargs == MAX_TYPE_ARGS)
-            break; 
         } 
 
     ffi->cif.nargs = nargs;
