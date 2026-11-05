@@ -330,3 +330,19 @@ This authorization supersedes the earlier restriction on branch publication.
 Build, core QA, embedding, architecture checks, and log upload pass in each job.
 The first attempt was blocked by hosted runner capacity; it did not establish a source-code failure.
 Item 11 is complete. Item 12 can proceed with synthetic workloads.
+
+
+### 2026-11-05: Measured release options complete
+
+Item 12 adds six deterministic synthetic workloads and a Python standard-library measurement runner.
+Forced core and embedding checks pass for baseline, O2, O3, and ThinLTO.
+The workloads also pass under ASan and UBSan.
+An initial FFI workload used an unsupported type spelling. The corrected fixture calls `labs` with the supported `long` signature.
+
+Two sessions use one warmup and nine measured runs per candidate/workload pair, with different shuffle seeds.
+The O2 geometric-mean elapsed-time reductions are 4.91% and 4.48% relative to baseline.
+Neither session meets the predefined five-percent threshold, so the default remains O1.
+This evidence changes the expected default-selection outcome, but does not change the item order.
+O2, O3, and ThinLTO remain explicit modes. Debug symbols remain enabled; fast-math remains disabled.
+[The report](benchmarks/results/2026-11-05.md) contains results, limitations, and links to raw samples.
+No real-program gain is claimed. Item 13 is next.

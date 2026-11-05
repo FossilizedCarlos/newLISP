@@ -21,7 +21,7 @@ Objects and dependency files reside under `build/arm64/<mode>/<configuration-has
 Changing the compiler, SDK, or flags selects a separate configuration.
 The final executable is also copied to `./newlisp` for compatibility with existing QA scripts.
 The build retains debug symbols and enables 64-bit cells, UTF-8, Readline, and FFI.
-The initial optimization level remains `-O1` until benchmark evidence supports a release default.
+The default optimization level remains `-O1`. Explicit release candidates are available for measurement.
 
 On native ARM64 macOS, `make clean` removes the ARM64 build directory and known top-level generated outputs.
 Other platforms retain their existing build paths. They have not been executed during this work.
@@ -170,3 +170,18 @@ The debug and sanitizer commands also pass locally as recorded in item 10.
 [Hosted run 41861645177](https://github.com/FossilizedCarlos/newLISP/actions/runs/41861645177), attempt 2, passes all four jobs for commit `74f40b0`.
 All jobs verify the native architecture, run core and embedding checks, and upload logs.
 The first attempt failed to acquire runners because of provider capacity; the rerun completes successfully.
+
+
+## Release build options
+
+Use `MODE=release-o2`, `MODE=release-o3`, or `MODE=release-lto` for `-O2`, `-O3`, or `-O3 -flto=thin`.
+Each mode retains debug symbols and uses separate objects. User-supplied `CFLAGS` still take precedence.
+The build does not enable `-ffast-math`.
+
+```sh
+make -f makefile_darwin_arm64 core-check embedding-check MODE=release-o2
+make -s -f makefile_darwin_arm64 print-binary MODE=release-o2
+```
+
+See the [benchmark procedure](../benchmarks/README.md) and [recorded measurements](../benchmarks/results/2026-11-05.md).
+The workloads are synthetic. They do not establish performance for your applications.

@@ -1,7 +1,7 @@
 # Apple Silicon implementation status
 
-Status: Approved on 2026-11-04. Items 1–11, including 9a and 9b, are complete.
-Hosted ARM64 verification passes. Items 12–14 remain pending. The current review confirms passing baseline, debug, ASan, and UBSan core QA.
+Status: Approved on 2026-11-04. Items 1–12, including 9a and 9b, are complete.
+Hosted ARM64 verification passes. Items 13–14 remain pending. The current review confirms passing baseline, debug, ASan, and UBSan core QA.
 Earlier failures below describe the state at each commit, not the current test results.
 
 The [detailed plan](Updating%20newLISP%20for%20Apple%20Silicon.md) defines each item and its verification.
@@ -169,13 +169,16 @@ If a runner is unavailable, record the blocker and do not claim CI verification 
 
 **Commit:** `Add native Apple Silicon regression CI`
 
-## Pending work
-
-Complete and commit each item before starting the next item.
-
 ### Item 12 — Measure and select release optimization
 
-**Status:** Pending.
+**Status:** Complete.
+
+Four candidates pass forced core and embedding QA. Six synthetic workloads pass under ASan and UBSan.
+Two sessions use warmups and nine measured runs per candidate/workload pair.
+The O2 elapsed-time reductions are 4.91% and 4.48%; neither meets the predefined five-percent threshold.
+The default remains baseline O1. Explicit O2, O3, and ThinLTO modes retain symbols and separate objects.
+[Measurements and raw data](benchmarks/results/2026-11-05.md) record timing, variation, memory, hashes, and environment.
+
 
 Add reproducible benchmark workloads for evaluation, allocation, lists, symbols, numeric operations, and FFI.
 Use synthetic workloads as selected by the user. Do not claim gains for real user programs.
@@ -188,6 +191,10 @@ Select the default from measured results. Keep `-ffast-math` disabled.
 Reject apparent improvements that are within measurement noise or change results.
 
 **Commit:** `Add measured release build options`
+
+## Pending work
+
+Complete and commit each item before starting the next item.
 
 ### Item 13 — Add optional profile-guided optimization
 
@@ -245,7 +252,7 @@ Review logs are in `/tmp/newlisp-opus-review/` and are local temporary artifacts
 These results do not cover other architectures or tests outside the core suite.
 
 The review updates documentation only. The agent instruction file remains unchanged.
-Next action: Measure synthetic release-build candidates (item 12).
+Next action: Add optional profile-guided optimization (item 13).
 
 ## README badge update
 

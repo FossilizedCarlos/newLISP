@@ -8,6 +8,12 @@ SDKROOT ?= $(shell xcrun --sdk macosx --show-sdk-path)
 MODE ?= baseline
 ifeq ($(MODE),debug)
 DEFAULT_CFLAGS := -O0 -g
+else ifeq ($(MODE),release-o2)
+DEFAULT_CFLAGS := -O2 -g
+else ifeq ($(MODE),release-o3)
+DEFAULT_CFLAGS := -O3 -g
+else ifeq ($(MODE),release-lto)
+DEFAULT_CFLAGS := -O3 -g -flto=thin
 else
 DEFAULT_CFLAGS := -O1 -g
 endif
@@ -89,3 +95,7 @@ embedding-check: all shared $(BUILD_DIR)/embedding-test
 	unset NEWLISPLIB_INIT; NEWLISP_EMBED_LIBRARY='$(abspath $(LIBRARY))' sh build-support/run-qa.sh ./newlisp qa-specific-tests/qa-embedding $(BUILD_DIR)/qa-embedding.log
 
 -include $(LIB_OBJECTS:.o=.d)
+
+.PHONY: print-binary
+print-binary:
+	@printf '%s\n' '$(abspath $(BINARY))'
