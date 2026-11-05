@@ -35,8 +35,8 @@ This fork does not advertise upstream Travis CI, AppVeyor, Codecov, or Gitter in
 
 ## Upstream resources
 
-- [newLISP](http://www.newlisp.org/)
-- [newLISP Forum](http://www.newlispfanclub.alh.net/)
+- [newLISP website — archived snapshot](https://web.archive.org/web/20251014111757/https://www.newlisp.org/): the original site is offline. This Wayback Machine snapshot is historical content, not a live website.
+- [newLISP Forum](https://newlispfanclub.com)
 - [Debian stable package](https://packages.debian.org/stable/newlisp): the distribution package, not a build of this fork.
 
 ## License
