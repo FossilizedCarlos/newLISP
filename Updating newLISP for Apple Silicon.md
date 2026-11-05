@@ -368,3 +368,14 @@ Two held-out measurement sessions are complete. PGO takes 2.59% and 2.12% more a
 The FFI regression repeats. PGO remains optional, and the ordinary O1 default remains unchanged.
 [The item 13 report](benchmarks/results/2026-11-05-pgo.md) preserves raw samples, profile metadata, and an embedded graph.
 Item 13 is complete. Item 14 requires a measured hotspot proposal before edits to interpreter internals.
+
+
+### 2026-11-05: Native profiling report completes item 14
+
+The installed macOS sampler collects two profiles for each of the six synthetic workloads. All 12 result checks pass.
+`xctrace` is unavailable, so this step uses `sample` without installing software.
+Evaluation, cell handling, and symbol lookup are repeated investigation targets.
+Source review does not establish a specific change with a demonstrated benefit.
+Item 14 therefore uses its approved report-only option. This does not claim a runtime improvement.
+[The report](benchmarks/results/2026-11-05-profiles.md) includes a graph, raw profiles, limitations, and proposed experiments.
+Any follow-up interpreter edit requires a concrete proposal and approval.

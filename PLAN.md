@@ -1,7 +1,7 @@
 # Apple Silicon implementation status
 
-Status: Approved on 2026-11-04. Items 1–13, including 9a and 9b, are complete.
-Hosted ARM64 verification passes. Item 14 remains pending. The current review confirms passing baseline, debug, ASan, and UBSan core QA.
+Status: Approved on 2026-11-04. Items 1–14, including 9a and 9b, are complete.
+Hosted ARM64 verification passes. Item 14 completes with the profiling-report option. The current review confirms passing baseline, debug, ASan, and UBSan core QA.
 Earlier failures below describe the state at each commit, not the current test results.
 
 The [detailed plan](Updating%20newLISP%20for%20Apple%20Silicon.md) defines each item and its verification.
@@ -222,13 +222,24 @@ Run regression tests and compare held-out benchmark results against the selected
 
 **Commit:** `Add optional profile-guided optimization`
 
-## Pending work
+## Profiling conclusion
 
 Complete and commit each item before starting the next item.
 
 ### Item 14 — Profile and optimize one demonstrated bottleneck
 
-**Status:** Pending.
+**Status:** Complete: profiling-report option.
+
+All 12 native profiles have checked workload results. No specific optimization has a demonstrated benefit.
+[Report and next experiments](benchmarks/results/2026-11-05-profiles.md) preserve raw profiles and a graph.
+Interpreter edits require a separate concrete proposal and approval.
+
+Use the installed macOS `sample` tool because `xctrace` is unavailable. Install no tools.
+Collect two three-second profiles for each synthetic workload on the ordinary O1 baseline.
+Keep the same checked results, increase workload duration, and retain raw call trees and binary identity.
+Separate inclusive call-tree counts from leaf samples; do not treat sampling counts as speedup measurements.
+Review the dominant functions in source before proposing a narrowly scoped change.
+
 
 Collect native profiles from representative workloads.
 Select an internal change only after identifying a dominant cost in evaluation, allocation, traversal, or symbol lookup.
@@ -269,7 +280,7 @@ Review logs are in `/tmp/newlisp-opus-review/` and are local temporary artifacts
 These results do not cover other architectures or tests outside the core suite.
 
 The review updates documentation only. The agent instruction file remains unchanged.
-Next action: Collect native profiles and propose a measured hotspot change for approval (item 14).
+Next action: Select a follow-up experiment from the native profiling report; no interpreter change is approved.
 
 ## README badge update
 
