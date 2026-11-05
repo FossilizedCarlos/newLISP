@@ -185,3 +185,9 @@ make -s -f makefile_darwin_arm64 print-binary MODE=release-o2
 
 See the [benchmark procedure](../benchmarks/README.md) and [recorded measurements](../benchmarks/results/2026-11-05.md).
 The workloads are synthetic. They do not establish performance for your applications.
+
+## Optional profile-guided optimization
+
+Use the [PGO procedure](apple-silicon-pgo.md) to train and validate a local profile.
+`MODE=pgo-generate` and `MODE=pgo-use` use separate O2 configurations.
+The ordinary O1 default and other release modes do not depend on profiles.

@@ -1,7 +1,7 @@
 # Apple Silicon implementation status
 
-Status: Approved on 2026-11-04. Items 1–12, including 9a and 9b, are complete.
-Hosted ARM64 verification passes. Items 13–14 remain pending. The current review confirms passing baseline, debug, ASan, and UBSan core QA.
+Status: Approved on 2026-11-04. Items 1–13, including 9a and 9b, are complete.
+Hosted ARM64 verification passes. Item 14 remains pending. The current review confirms passing baseline, debug, ASan, and UBSan core QA.
 Earlier failures below describe the state at each commit, not the current test results.
 
 The [detailed plan](Updating%20newLISP%20for%20Apple%20Silicon.md) defines each item and its verification.
@@ -192,13 +192,26 @@ Reject apparent improvements that are within measurement noise or change results
 
 **Commit:** `Add measured release build options`
 
-## Pending work
-
-Complete and commit each item before starting the next item.
-
 ### Item 13 — Add optional profile-guided optimization
 
-**Status:** Pending.
+**Status:** Complete.
+
+Generation, training, merge, and profile-use core/embedding checks pass with installed LLVM tools.
+Profile rejection tests pass, including changed sources/settings, missing/corrupt data, and content-based object isolation.
+Two nine-repeat sessions evaluate six held-out synthetic workloads against O1 and plain O2.
+PGO takes 2.59% and 2.12% more aggregate elapsed time than plain O2, with a repeated FFI regression.
+PGO remains optional. The ordinary default remains O1.
+[Results and raw data](benchmarks/results/2026-11-05-pgo.md) include the training manifest and graph.
+One QA repeat failed the existing UDP tests; the complete rerun passes unchanged. Its cause is not established.
+
+
+Use O2 for both instrumented and profile-use builds. Keep the ordinary O1 default independent of profiles.
+Train with core QA and embedding fixtures; reserve all six item 12 timing workloads for evaluation only.
+Record source/header hashes, compiler identity, SDK, flags, and profile checksum in a manifest.
+Reject missing, changed, or incompatible profiles before compilation. Include the profile checksum in the object directory key.
+Verify rejection paths and run core and embedding checks on the profile-use build.
+Compare held-out results with both O1 and plain O2 to separate optimization-level effects from profile effects.
+
 
 Provide separate profile-generation and profile-use configurations with distinct output directories.
 Train on representative workloads and evaluate on separate workloads.
@@ -208,6 +221,10 @@ Handle missing, stale, or incompatible profiles explicitly. Keep ordinary releas
 Run regression tests and compare held-out benchmark results against the selected release baseline.
 
 **Commit:** `Add optional profile-guided optimization`
+
+## Pending work
+
+Complete and commit each item before starting the next item.
 
 ### Item 14 — Profile and optimize one demonstrated bottleneck
 
@@ -252,7 +269,7 @@ Review logs are in `/tmp/newlisp-opus-review/` and are local temporary artifacts
 These results do not cover other architectures or tests outside the core suite.
 
 The review updates documentation only. The agent instruction file remains unchanged.
-Next action: Add optional profile-guided optimization (item 13).
+Next action: Collect native profiles and propose a measured hotspot change for approval (item 14).
 
 ## README badge update
 

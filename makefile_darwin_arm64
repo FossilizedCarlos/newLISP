@@ -8,6 +8,8 @@ SDKROOT ?= $(shell xcrun --sdk macosx --show-sdk-path)
 MODE ?= baseline
 ifeq ($(MODE),debug)
 DEFAULT_CFLAGS := -O0 -g
+else ifneq ($(filter pgo-generate pgo-use,$(MODE)),)
+DEFAULT_CFLAGS := -O2 -g
 else ifeq ($(MODE),release-o2)
 DEFAULT_CFLAGS := -O2 -g
 else ifeq ($(MODE),release-o3)
@@ -24,12 +26,24 @@ ifeq ($(MODE),ubsan)
 MODE_FLAGS := -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer
 endif
 CFLAGS ?= $(DEFAULT_CFLAGS)
+PROFILE ?= $(abspath build/pgo/current.profdata)
+PGO_ENV = PGO_CC='$(CC)' PGO_SDKROOT='$(SDKROOT)' PGO_CPPFLAGS='$(CPPFLAGS)' PGO_CFLAGS='$(CFLAGS)' PGO_LDFLAGS='$(LDFLAGS)' PGO_LDLIBS='$(LDLIBS)'
+ifeq ($(MODE),pgo-generate)
+MODE_FLAGS := -fprofile-instr-generate=$(abspath build/pgo/raw)/%m-%p.profraw
+endif
+ifeq ($(MODE),pgo-use)
+PROFILE_KEY := $(shell $(PGO_ENV) python3 build-support/pgo.py validate '$(PROFILE)')
+ifeq ($(PROFILE_KEY),)
+$(error Missing or invalid PGO profile. Run make -f makefile_darwin_arm64 pgo-train MODE=pgo-generate)
+endif
+MODE_FLAGS := -fprofile-instr-use=$(PROFILE) -Werror=profile-instr-out-of-date -Werror=profile-instr-unprofiled
+endif
 ARCH := arm64
 REQUIRED_CPPFLAGS := -DREADLINE -DNEWLISP64 -DMAC_OSX -DSUPPORT_UTF8 -DFFI
 SOURCES := newlisp.c nl-symbol.c nl-math.c nl-list.c nl-liststr.c nl-string.c \
  nl-filesys.c nl-sock.c nl-import.c nl-xml-json.c nl-web.c nl-matrix.c \
  nl-debug.c pcre.c nl-utf8.c
-CONFIG_KEY := $(shell printf '%s\n' '$(SDKROOT)' '$(CC)' '$(CPPFLAGS)' '$(CFLAGS)' '$(MODE_FLAGS)' '$(LDFLAGS)' '$(LDLIBS)' | shasum | cut -c1-12)
+CONFIG_KEY := $(shell printf '%s\n' '$(SDKROOT)' '$(CC)' '$(CPPFLAGS)' '$(CFLAGS)' '$(MODE_FLAGS)' '$(PROFILE_KEY)' '$(LDFLAGS)' '$(LDLIBS)' | shasum | cut -c1-12)
 BUILD_DIR := build/$(ARCH)/$(MODE)/$(CONFIG_KEY)
 OBJECTS := $(SOURCES:%.c=$(BUILD_DIR)/%.o)
 BINARY := $(BUILD_DIR)/newlisp
@@ -99,3 +113,8 @@ embedding-check: all shared $(BUILD_DIR)/embedding-test
 .PHONY: print-binary
 print-binary:
 	@printf '%s\n' '$(abspath $(BINARY))'
+
+.PHONY: pgo-train
+pgo-train:
+	@test "$(MODE)" = pgo-generate || { echo "Use MODE=pgo-generate for pgo-train" >&2; exit 2; }
+	$(PGO_ENV) python3 build-support/pgo.py train '$(PROFILE)'

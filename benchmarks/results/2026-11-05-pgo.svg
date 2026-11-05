@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 315" role="img" aria-labelledby="title desc">
+<title id="title">Held-out synthetic PGO evaluation</title><desc id="desc">Two sessions compare O1, O2, and profile-guided O2. PGO is slower overall than plain O2 for these workloads.</desc>
+<rect width="760" height="315" fill="white"/>
+<g font-family="sans-serif" fill="#172033"><text x="20" y="28" font-size="18">Held-out synthetic elapsed time — O1 baseline = 1.000</text><text x="20" y="50" font-size="13">Geometric mean of six workloads; lower is better</text>
+<text x="20" y="103" font-size="14">baseline</text>
+<rect x="125" y="80" width="500.00" height="20" fill="#245ac7"/><text x="635.00" y="95" font-size="13">1.0000</text>
+<rect x="125" y="104" width="500.00" height="20" fill="#087d75"/><text x="635.00" y="119" font-size="13">1.0000</text>
+<text x="20" y="168" font-size="14">release-o2</text>
+<rect x="125" y="145" width="476.60" height="20" fill="#245ac7"/><text x="611.60" y="160" font-size="13">0.9532</text>
+<rect x="125" y="169" width="480.75" height="20" fill="#087d75"/><text x="615.75" y="184" font-size="13">0.9615</text>
+<text x="20" y="233" font-size="14">pgo-use</text>
+<rect x="125" y="210" width="488.96" height="20" fill="#245ac7"/><text x="623.96" y="225" font-size="13">0.9779</text>
+<rect x="125" y="234" width="490.96" height="20" fill="#087d75"/><text x="625.96" y="249" font-size="13">0.9819</text>
+<text x="20" y="290" font-size="13">Blue: session 1 · Green: session 2 · Nine runs per workload per session</text></g></svg>

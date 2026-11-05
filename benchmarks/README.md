@@ -55,3 +55,9 @@ Keep `-ffast-math` disabled. Do not infer real-program performance from these sy
 ## Recorded results
 
 [2026-11-05 measurements](results/2026-11-05.md) retain the O1 default and expose the other modes as options.
+
+## PGO evaluation
+
+For item 13, train with core QA and embedding tests, then measure these six workloads without further training.
+Compare `pgo-use` against both `baseline` and `release-o2`.
+See the [PGO procedure](../doc/apple-silicon-pgo.md) for profile checks and build commands.

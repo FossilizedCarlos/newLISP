@@ -1,0 +1,53 @@
+{
+  "identity": {
+    "files": {
+      "newlisp.c": "c4142cd25c198912926dfc5ef2d337a66ae624d78d72d8e1b85d57535094c8e7",
+      "newlisp.h": "c958bc311f080d35a35d07cdc48937ed09275a9e3e881e9b286de4ce40294ae2",
+      "nl-debug.c": "3c8c896c4b2c96d871b7be2b8a9534a59ef2079e823f7d10cf7ca9db85650f86",
+      "nl-filesys.c": "74f35093ce14e3a660db7105e14e205de5a5ffab19c2ba9814e7dabbc6e117f8",
+      "nl-import.c": "1cdfff10eed34c3bb0b9591494f537b75e65df32bfeb418f200d1dd8dad8a318",
+      "nl-list.c": "5808ae323f6c66868a208959a5ba7ea622b2055ef62ba2eca5042e860a20e7d1",
+      "nl-liststr.c": "41ce3d7590d8ce44522cffa71412592781c6d6cfeaae297ed916f1430de4eefa",
+      "nl-math.c": "337bc5daacbc901712a7ced9f57291fc794801c390e26ebe1f40a85fa0b97029",
+      "nl-matrix.c": "4e2c592e61b84ff8fe86544d6979a0ebf0e2a5b0038022897a3eabd1fd9a4902",
+      "nl-sock.c": "fdc13b2c0126b7cee0327db6e5d149a179a159a787001c2b8cbd642e083ae685",
+      "nl-string.c": "b3fc6c8fcc9e00320a0f547bc08749e0a4fb968820b9ff8950d296bc7001a364",
+      "nl-symbol.c": "4530f7b3dec54cbc93ec04ed576cbd0952cd7b9978cdd73599cd8dd113ff4c68",
+      "nl-utf8.c": "363f8832115b16dd7a31b5af566adbbf3473baa54653bd39e0e096aa4e67cc72",
+      "nl-web.c": "a583515130ab2e20c886c7cb1bc47a84f81879df23ad5db9dcf94c5de77c89c1",
+      "nl-xml-json.c": "13fe6291e7136a8038974a4458f255451d46b7bc63ec811fd0fb30e0c4e1f404",
+      "pcre-chartables.c": "8adde4ae567d9766a0d8250b0798b6db0340a5e34952887240434b6ffbd6d51b",
+      "pcre-config.h": "ca9fb3a454f4449412103d133ed43211062bd70d4483490aef0d033e0b871b56",
+      "pcre-internal.h": "1cc807c1dd15e29961b824be42bf7a3603072e384470b5b9dfeb5e312be89380",
+      "pcre.c": "a4458a1f39cf86e68a22343891cd52fbe80cf20ace4a3a4d8f875facf84a9fd4",
+      "pcre.h": "222a3143ad353b4478343e4e39f9e20fdd91d40eadc169bfeb0a58b51af3da3b",
+      "primes.h": "54624316c47d9782f713552191d2a337ee77010d73c467c8c27547c22b3ac56e",
+      "protos.h": "3edd146d3520be13577c7fa6c2baaa3ead3802de4e29e78905f05c969eae85c6",
+      "unix-lib.c": "f3ebcb681f55d2ad7ca30bb018b0166343babe07fbcae322e6e34e4b09192eba",
+      "win-dll.c": "07b87e4470c4fab08af184eb912eeddd0875e4ee11ba6f12b01e8ef67c554dda",
+      "win-ffi.h": "3dd2159fc33d74be31a703b216b193e428ed5729f7062308b0042daa97781b6a",
+      "win-path.c": "4a2343382bff9b8f212ff3c7352a00ecf36e6713e3039cbcd189959a43809865",
+      "win-util.c": "1c8254b75c9be4d68e4a31a3b4eaf56137988faae27e5db810c23ea36459c27b",
+      "util/embedding-test.c": "eb79ec8837f215d4c77713caeb836769c91845f709523b7205da966c849d437b",
+      "util/ffitest.c": "3e4c293635f6365495a12c61e55c86d8587120341f4c15d2c0a9c3966ccfedc6",
+      "util/arm64-callback.c": "63f0a4e581a827c5d0e080e1bea3804e99747f4c13d120f491fb95b512d0b296",
+      "makefile_darwin_arm64": "1c9cae992689f7733e17feae2df1664ba679c3c9440d99949d408320ced303bd",
+      "build-support/apple-silicon-deps.sh": "d4af45d24a44111c77940b9b1cc2f9a9b354e93f112b69eead20880effabc9e9",
+      "build-support/pgo.py": "246f1409a32a68cb07be68c572139e6b9b9ea15f9f31eaf2a24fc155f0adfef2"
+    },
+    "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin",
+    "settings": {
+      "CC": "/Library/Developer/CommandLineTools/usr/bin/clang",
+      "SDKROOT": "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "CPPFLAGS": "",
+      "CFLAGS": "-O2 -g",
+      "LDFLAGS": "",
+      "LDLIBS": ""
+    },
+    "sdk_version": "27.0",
+    "architecture": "arm64"
+  },
+  "profile_sha256": "875cbf7ecb0f80dd1508ffa1cf0cbc1d8550d594282aca315bdfd65a32c14834",
+  "training": "core-check and embedding-check; no benchmark timing workloads",
+  "raw_profile_count": 32
+}

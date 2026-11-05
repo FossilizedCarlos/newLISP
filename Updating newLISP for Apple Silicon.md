@@ -348,3 +348,23 @@ O2, O3, and ThinLTO remain explicit modes. Debug symbols remain enabled; fast-ma
 No real-program gain is claimed. Item 13 is next.
 
 The item 12 report now embeds the two-session graph as a repository-local SVG, as requested by the user.
+
+
+### 2026-11-05: Optional PGO implementation and verification
+
+Item 13 uses O2 for profile generation and use. The selected ordinary release baseline remains O1.
+Training uses core QA and embedding fixtures. The six item 12 timing workloads remain held out.
+Comparison includes plain O2, so optimization-level effects can be distinguished from profile effects.
+This adapts the representative-workload requirement to the user-approved synthetic-only scope.
+
+The profile manifest checks source/header hashes, fixture sources, build rules, compiler, SDK, architecture, flags, and profile checksum.
+Invalid or incompatible profiles stop the build. Profile contents select a separate object directory.
+A fresh training directory prevents data from earlier runs entering a merge.
+
+One repeat profile-use QA run failed the existing localhost UDP tests. An earlier run and the complete rerun pass them.
+No test was skipped or changed. The cause of that isolated failure is not established.
+Generation, merge, profile-use core/embedding checks, and profile-validation rejection tests pass.
+Two held-out measurement sessions are complete. PGO takes 2.59% and 2.12% more aggregate elapsed time than plain O2.
+The FFI regression repeats. PGO remains optional, and the ordinary O1 default remains unchanged.
+[The item 13 report](benchmarks/results/2026-11-05-pgo.md) preserves raw samples, profile metadata, and an embedded graph.
+Item 13 is complete. Item 14 requires a measured hotspot proposal before edits to interpreter internals.
