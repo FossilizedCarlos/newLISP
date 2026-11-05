@@ -1,7 +1,7 @@
 # Apple Silicon implementation status
 
-Status: Approved on 2026-11-04. Items 1–14, including 9a and 9b, are complete.
-New review: proposed items 15–18 below await implementation approval.
+Status: Approved implementation items 1–18, including 9a and 9b, are complete.
+The user approved items 15–18 after the follow-up review.
 Hosted ARM64 verification passes. Item 14 completes with the profiling-report option. The current review confirms passing baseline, debug, ASan, and UBSan core QA.
 Earlier failures below describe the state at each commit, not the current test results.
 
@@ -281,7 +281,7 @@ Review logs are in `/tmp/newlisp-opus-review/` and are local temporary artifacts
 These results do not cover other architectures or tests outside the core suite.
 
 The review updates documentation only. The agent instruction file remains unchanged.
-Next action: Select a follow-up experiment from the native profiling report; no interpreter change is approved.
+Current next action: Review the final verification record below. No further interpreter change is approved.
 
 ## README badge update
 
@@ -293,7 +293,7 @@ The Debian package remains a labelled upstream resource, not a fork build badge.
 Verification: Markdown whitespace checks, local link targets, and owner/branch checks.
 
 
-## Follow-up code review — proposed work
+## Follow-up code review — completed work
 
 Review scope: native build rules, FFI preparation and calls, PGO profile handling, and measurement helpers.
 This is a targeted review, not a complete audit of the interpreter.
@@ -384,3 +384,43 @@ Item 16 verification adjustment: two harness attempts failed (protected `count`,
 Revised verification uses a fresh context per signature and explicit declarations; native calls are never made with these signatures.
 
 **Completion:** Clean-only PGO use skips profile validation. Default, build, and mixed goals still reject missing, corrupt, and stale profiles. Run python3 build-support/test-native-build.py: all four tests pass. Dry-run and actual cleanup pass in temporary directories. Cleanup removes build/arm64 and retains other outputs. The real validator uses a fixed test identity. No native compilation or profile training runs. Makefile changes invalidate existing profile manifests; train again before the next PGO build.
+
+
+## Final verification — 2026-11-05
+
+Items 15–18 have separate commits:
+
+- Item 15: `476277f` — Validate FFI structure argument lengths.
+- Item 16: `ba15632` — Reject oversized FFI signatures.
+- Item 17: `8d2f13d` — Validate native build mode names.
+- Item 18: `8521f3a` — Allow PGO cleanup without profile data.
+
+[Hosted run 42000977154](https://github.com/FossilizedCarlos/newLISP/actions/runs/42000977154) passes for `8521f3a`.
+Baseline, debug, ASan, and UBSan jobs pass core QA, embedding, architecture checks, and log upload.
+All four log artifacts are present. GitHub API verification occurred on 2026-11-05.
+
+Fresh local PGO verification also passes after the final makefile changes:
+
+```sh
+make -f makefile_darwin_arm64 pgo-train MODE=pgo-generate
+make -f makefile_darwin_arm64 core-check embedding-check MODE=pgo-use
+python3 build-support/test-pgo.py
+python3 build-support/test-native-build.py
+make -f makefile_darwin_arm64 all shared MODE=baseline
+```
+
+All commands exit zero. PGO training creates a new profile and manifest.
+Profile-use core QA and embedding pass. Profile validation checks pass, and all four native build-rule tests pass.
+The final command restores the ordinary O1 executable and shared library.
+Existing compiler indentation and prototype warnings remain visible in the build logs.
+
+Local logs:
+
+- `/tmp/newlisp-final-pgo-train.log`
+- `/tmp/newlisp-final-pgo-use.log`
+- `/tmp/newlisp-final-validation.log`
+- `/tmp/newlisp-final-baseline-restore.log`
+
+No software was installed. No new benchmark measurements or performance claims are added.
+Other architectures, shared-library unload/reload, and concurrent evaluation remain outside the verified scope.
+Further interpreter optimization requires a separate proposal and approval.

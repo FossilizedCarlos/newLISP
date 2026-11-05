@@ -10,10 +10,15 @@ tags:
 
 ## Status and build responsibility
 
-The user approved implementation on 2026-11-04. Items 1–11, including additions 9a and 9b, are complete.
+The user approved implementation on 2026-11-04 and later approved follow-up items 15–18.
+Items 1–18, including additions 9a and 9b, are complete.
 The initial compilation and sanitizer failures are resolved in the tested core suite.
 A review after the Opus handoff confirms passing forced builds in baseline, debug, ASan, and UBSan modes.
-Hosted baseline, debug, ASan, and UBSan jobs pass. Items 12–14 remain pending.
+Hosted baseline, debug, ASan, and UBSan jobs pass for `8521f3a`.
+[Run 42000977154](https://github.com/FossilizedCarlos/newLISP/actions/runs/42000977154) includes core QA, embedding, architecture checks, and saved logs.
+Fresh local PGO training, profile-use core QA and embedding, and profile/build-rule validation pass after the final makefile changes.
+The ordinary O1 executable and shared library are restored. See `PLAN.md` for commands, commits, and local logs.
+Items 12–14 retain their measured conclusions. No new performance claim or further interpreter change is approved.
 
 I will run `make` and inspect its output under the approved plan. You do not need to run it yourself.
 I will also run the regression tests, sanitizer builds, and benchmarks described below.
