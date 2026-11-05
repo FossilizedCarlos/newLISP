@@ -346,3 +346,5 @@ This evidence changes the expected default-selection outcome, but does not chang
 O2, O3, and ThinLTO remain explicit modes. Debug symbols remain enabled; fast-math remains disabled.
 [The report](benchmarks/results/2026-11-05.md) contains results, limitations, and links to raw samples.
 No real-program gain is claimed. Item 13 is next.
+
+The item 12 report now embeds the two-session graph as a repository-local SVG, as requested by the user.

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" role="img" aria-labelledby="title desc">
+<title id="title">Synthetic release elapsed time</title><desc id="desc">Two sessions compare baseline, O2, O3, and ThinLTO. Lower is better. No candidate meets the default-change threshold in both sessions.</desc>
+<rect width="760" height="380" fill="white"/>
+<g font-family="sans-serif" fill="#172033"><text x="20" y="28" font-size="18">Synthetic elapsed time — baseline = 1.000</text><text x="20" y="50" font-size="13">Geometric mean of six workloads; lower is better</text>
+<text x="20" y="103" font-size="14">baseline</text>
+<rect x="125" y="80" width="500.00" height="20" fill="#245ac7"/><text x="635.00" y="95" font-size="13">1.0000</text>
+<rect x="125" y="104" width="500.00" height="20" fill="#087d75"/><text x="635.00" y="119" font-size="13">1.0000</text>
+<text x="20" y="168" font-size="14">release-o2</text>
+<rect x="125" y="145" width="475.43" height="20" fill="#245ac7"/><text x="610.43" y="160" font-size="13">0.9509</text>
+<rect x="125" y="169" width="477.61" height="20" fill="#087d75"/><text x="612.61" y="184" font-size="13">0.9552</text>
+<text x="20" y="233" font-size="14">release-o3</text>
+<rect x="125" y="210" width="482.08" height="20" fill="#245ac7"/><text x="617.08" y="225" font-size="13">0.9642</text>
+<rect x="125" y="234" width="486.91" height="20" fill="#087d75"/><text x="621.91" y="249" font-size="13">0.9738</text>
+<text x="20" y="298" font-size="14">release-lto</text>
+<rect x="125" y="275" width="488.41" height="20" fill="#245ac7"/><text x="623.41" y="290" font-size="13">0.9768</text>
+<rect x="125" y="299" width="481.64" height="20" fill="#087d75"/><text x="616.64" y="314" font-size="13">0.9633</text>
+<text x="20" y="355" font-size="13">Blue: session 1 · Green: session 2 · Nine measured runs per workload per session</text></g></svg>
