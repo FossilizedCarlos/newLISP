@@ -366,7 +366,7 @@ Check each supported mode and confirm sanitizer flags remain present in compile 
 
 ### Item 18 — Allow cleanup without a valid PGO profile
 
-**Priority:** Low. **Status:** Proposed; reproduced with a dry run.
+**Priority:** Low. **Status:** Complete; reproduced with a dry run.
 
 `make -n -f makefile_darwin_arm64 clean MODE=pgo-use PROFILE=/tmp/newlisp-review-absent.profdata` fails at profile validation.
 The profile check runs during makefile parsing, before the clean target can run.
@@ -382,3 +382,5 @@ Verify ordinary cleanup in an isolated generated-output directory.
 
 Item 16 verification adjustment: two harness attempts failed (protected `count`, then cached imports).
 Revised verification uses a fresh context per signature and explicit declarations; native calls are never made with these signatures.
+
+**Completion:** Clean-only PGO use skips profile validation. Default, build, and mixed goals still reject missing, corrupt, and stale profiles. Run python3 build-support/test-native-build.py: all four tests pass. Dry-run and actual cleanup pass in temporary directories. Cleanup removes build/arm64 and retains other outputs. The real validator uses a fixed test identity. No native compilation or profile training runs. Makefile changes invalidate existing profile manifests; train again before the next PGO build.

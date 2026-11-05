@@ -39,9 +39,11 @@ ifeq ($(MODE),pgo-generate)
 MODE_FLAGS := -fprofile-instr-generate=$(abspath build/pgo/raw)/%m-%p.profraw
 endif
 ifeq ($(MODE),pgo-use)
+ifneq ($(MAKECMDGOALS),clean)
 PROFILE_KEY := $(shell $(PGO_ENV) python3 build-support/pgo.py validate '$(PROFILE)')
 ifeq ($(PROFILE_KEY),)
 $(error Missing or invalid PGO profile. Run make -f makefile_darwin_arm64 pgo-train MODE=pgo-generate)
+endif
 endif
 MODE_FLAGS := -fprofile-instr-use=$(PROFILE) -Werror=profile-instr-out-of-date -Werror=profile-instr-unprofiled
 endif

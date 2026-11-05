@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Check native make rules in temporary directories without compiling sources."""
 from pathlib import Path
+import json
 import shutil
 import subprocess
 import tempfile
@@ -32,9 +33,9 @@ class NativeBuildTests(unittest.TestCase):
         for source in ROOT.glob('*.c'):
             (self.root / source.name).touch()
 
-    def make(self, mode, *goals, overrides=()):
+    def make(self, mode, *goals, overrides=(), dry_run=True):
         return subprocess.run(
-            ['make', '-n', '-f', 'makefile_darwin_arm64', 'CC=clang',
+            ['make', *(['-n'] if dry_run else []), '-f', 'makefile_darwin_arm64', 'CC=clang',
              'SDKROOT=/test-sdk', 'MODE=' + mode, *overrides, *goals],
             cwd=self.root, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
@@ -69,6 +70,49 @@ class NativeBuildTests(unittest.TestCase):
         self.assertIn('-DUSER_FLAG', result.stdout)
         self.assertIn('-L/custom', result.stdout)
         self.assertIn('-lcustom', result.stdout)
+
+    def test_clean_without_valid_profiles(self):
+        # Use the real validator with a fixed identity, without compiler or SDK probes.
+        shutil.copy(ROOT / 'build-support/pgo.py', self.root / 'build-support/real-pgo.py')
+        (self.root / 'build-support/pgo.py').write_text(
+            'from pathlib import Path\nimport runpy\n'
+            'Path("profile-probe").touch()\n'
+            'ns = runpy.run_path("build-support/real-pgo.py")\n'
+            'ns["validate"].__globals__["identity"] = lambda: {"current": True}\n'
+            'raise SystemExit(ns["main"]())\n')
+        profile = self.root / 'test.profdata'
+        manifest = Path(str(profile) + '.json')
+        for state in ('missing', 'corrupt', 'stale'):
+            with self.subTest(profile=state):
+                profile.unlink(missing_ok=True)
+                manifest.unlink(missing_ok=True)
+                if state != 'missing':
+                    profile.write_bytes(b'invalid profile')
+                    manifest.write_text('invalid json' if state == 'corrupt' else
+                                        json.dumps({'identity': {'old': True}}))
+                overrides = ('PROFILE=' + str(profile),)
+                (self.root / 'profile-probe').unlink(missing_ok=True)
+                result = self.make('pgo-use', 'clean', overrides=overrides)
+                self.assertEqual(result.returncode, 0, result.stdout)
+                self.assertIn('rm -rf build/arm64', result.stdout)
+                self.assertFalse((self.root / 'profile-probe').exists())
+                for goals in ((), ('all',), ('clean', 'all'), ('all', 'clean')):
+                    result = self.make('pgo-use', *goals, overrides=overrides)
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    self.assertIn('Missing or invalid PGO profile', result.stdout)
+                    self.assertTrue((self.root / 'profile-probe').exists())
+                    self.assertFalse((self.root / 'dependency-probe').exists())
+                    (self.root / 'profile-probe').unlink()
+                output = self.root / 'build/arm64/pgo-use/test/newlisp'
+                output.parent.mkdir(parents=True)
+                output.touch()
+                retained = self.root / 'build/retained'
+                retained.touch()
+                result = self.make('pgo-use', 'clean', overrides=overrides, dry_run=False)
+                self.assertEqual(result.returncode, 0, result.stdout)
+                self.assertFalse((self.root / 'build/arm64').exists())
+                self.assertTrue(retained.exists())
+                self.assertFalse((self.root / 'profile-probe').exists())
 
 
 if __name__ == '__main__':

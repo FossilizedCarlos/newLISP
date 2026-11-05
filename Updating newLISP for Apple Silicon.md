@@ -405,3 +405,8 @@ FFI preparation now rejects excess arguments and validates trailing declaration 
 ### Follow-up item 17 complete
 
 Unknown, empty, and multiple MODE values stop before dependency or profile checks. All nine supported modes retain compile and link flags. Explicit compiler and flag overrides pass. Run python3 build-support/test-native-build.py: three tests pass in isolated directories. PGO validation uses a fixture; no profile training or native compilation runs.
+
+
+### Follow-up item 18 complete
+
+Clean-only PGO use skips profile validation. Default, build, and mixed goals still reject missing, corrupt, and stale profiles. Run python3 build-support/test-native-build.py: all four tests pass. Dry-run and actual cleanup pass in temporary directories. Cleanup removes build/arm64 and retains other outputs. The real validator uses a fixed test identity. No native compilation or profile training runs. Makefile changes invalidate existing profile manifests; train again before the next PGO build.
