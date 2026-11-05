@@ -389,7 +389,7 @@ A declaration probe confirms silent truncation after 32 FFI argument types.
 Make probes confirm that unknown modes fall back to O1 and missing PGO profiles block clean-only requests.
 The cleanup probe uses dry-run mode and deletes nothing.
 These findings extend coverage beyond the earlier passing suites; they do not invalidate those recorded test results.
-No implementation changes occur in this review. New items await approval and retain one commit per item.
+No implementation changes occur in this review. The user later approved items 15–18, with one commit per item.
 
 
 ### Follow-up item 15 complete
@@ -400,3 +400,8 @@ Structure-string arguments are length-checked before copying. Empty, short, exac
 ### Follow-up item 16 complete
 
 FFI preparation now rejects excess arguments and validates trailing declaration tokens. Boundary and variadic-marker regressions use fresh import contexts. Baseline, ASan, and UBSan FFI suites pass. Two initial harness failures were corrected as recorded in the plan.
+
+
+### Follow-up item 17 complete
+
+Unknown, empty, and multiple MODE values stop before dependency or profile checks. All nine supported modes retain compile and link flags. Explicit compiler and flag overrides pass. Run python3 build-support/test-native-build.py: three tests pass in isolated directories. PGO validation uses a fixture; no profile training or native compilation runs.

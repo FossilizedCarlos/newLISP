@@ -297,7 +297,7 @@ Verification: Markdown whitespace checks, local link targets, and owner/branch c
 
 Review scope: native build rules, FFI preparation and calls, PGO profile handling, and measurement helpers.
 This is a targeted review, not a complete audit of the interpreter.
-Items 1–14 remain complete. The following items are proposed, not implemented or approved.
+Items 1–14 remain complete. The user approved items 15–18 for separate implementation and verification.
 Implement and commit each approved item separately, in this order.
 
 ### Item 15 — Check structure argument buffer lengths
@@ -349,7 +349,7 @@ Verify existing fixed and variadic fixtures under baseline and sanitizers.
 
 ### Item 17 — Reject unknown native build modes
 
-**Priority:** Medium. **Status:** Proposed; reproduced through make.
+**Priority:** Medium. **Status:** Complete; reproduced through make.
 
 `MODE=assn` returns a build path successfully and falls through to O1 without sanitizer flags.
 A misspelled sanitizer mode can therefore produce an ordinary binary without an error.
@@ -361,6 +361,8 @@ Report the supported values when a mode is unknown. Preserve explicit compiler/f
 Check each supported mode and confirm sanitizer flags remain present in compile and link commands.
 
 **Commit:** `Validate native build mode names`
+
+**Completion:** Unknown, empty, and multiple MODE values stop before dependency or profile checks. All nine supported modes retain compile and link flags. Explicit compiler and flag overrides pass. Run python3 build-support/test-native-build.py: three tests pass in isolated directories. PGO validation uses a fixture; no profile training or native compilation runs.
 
 ### Item 18 — Allow cleanup without a valid PGO profile
 

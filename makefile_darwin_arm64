@@ -6,6 +6,13 @@ endif
 CC ?= $(shell xcrun --find clang)
 SDKROOT ?= $(shell xcrun --sdk macosx --show-sdk-path)
 MODE ?= baseline
+SUPPORTED_MODES := baseline debug asan ubsan release-o2 release-o3 release-lto pgo-generate pgo-use
+ifneq ($(words $(MODE)),1)
+$(error Unknown MODE "$(MODE)". Supported modes: $(SUPPORTED_MODES))
+endif
+ifeq ($(filter $(SUPPORTED_MODES),$(MODE)),)
+$(error Unknown MODE "$(MODE)". Supported modes: $(SUPPORTED_MODES))
+endif
 ifeq ($(MODE),debug)
 DEFAULT_CFLAGS := -O0 -g
 else ifneq ($(filter pgo-generate pgo-use,$(MODE)),)
