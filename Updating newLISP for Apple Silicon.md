@@ -379,3 +379,14 @@ Source review does not establish a specific change with a demonstrated benefit.
 Item 14 therefore uses its approved report-only option. This does not claim a runtime improvement.
 [The report](benchmarks/results/2026-11-05-profiles.md) includes a graph, raw profiles, limitations, and proposed experiments.
 Any follow-up interpreter edit requires a concrete proposal and approval.
+
+
+### 2026-11-05: Follow-up correctness review
+
+A targeted review finds four actionable follow-ups, recorded as proposed items 15–18 in `PLAN.md`.
+ASan reproduces an unchecked structure-string read in `executeLibFFI`.
+A declaration probe confirms silent truncation after 32 FFI argument types.
+Make probes confirm that unknown modes fall back to O1 and missing PGO profiles block clean-only requests.
+The cleanup probe uses dry-run mode and deletes nothing.
+These findings extend coverage beyond the earlier passing suites; they do not invalidate those recorded test results.
+No implementation changes occur in this review. New items await approval and retain one commit per item.

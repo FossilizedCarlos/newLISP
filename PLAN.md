@@ -1,6 +1,7 @@
 # Apple Silicon implementation status
 
 Status: Approved on 2026-11-04. Items 1–14, including 9a and 9b, are complete.
+New review: proposed items 15–18 below await implementation approval.
 Hosted ARM64 verification passes. Item 14 completes with the profiling-report option. The current review confirms passing baseline, debug, ASan, and UBSan core QA.
 Earlier failures below describe the state at each commit, not the current test results.
 
@@ -290,3 +291,85 @@ Repository, issues, pull requests, releases, and license links point to this for
 Inherited upstream service badges are removed instead of assigning unverified service identifiers.
 The Debian package remains a labelled upstream resource, not a fork build badge.
 Verification: Markdown whitespace checks, local link targets, and owner/branch checks.
+
+
+## Follow-up code review — proposed work
+
+Review scope: native build rules, FFI preparation and calls, PGO profile handling, and measurement helpers.
+This is a targeted review, not a complete audit of the interpreter.
+Items 1–14 remain complete. The following items are proposed, not implemented or approved.
+Implement and commit each approved item separately, in this order.
+
+### Item 15 — Check structure argument buffer lengths
+
+**Priority:** High. **Status:** Proposed; reproduced under ASan.
+
+`executeLibFFI` copies `ffiType->size` bytes from a Lisp string without checking its length.
+With the existing fixture, the following call reads 12 bytes from a one-byte allocation:
+
+```lisp
+(struct 'clock "char" "int" "short int")
+(import FIXTURE "addClock" "clock" "clock")
+(addClock "")
+```
+
+ASan reports a heap-buffer-overflow in `executeLibFFI` through `memcpy`.
+The first probe used unsupported `short`; the corrected `short int` declaration reproduces the memory fault.
+The diagnostic is saved locally at `/tmp/newlisp-review-struct-asan.log`.
+
+Reject string arguments whose payload is smaller than the required native structure before copying.
+Preserve support for sufficiently large buffers and document raw-pointer caller obligations.
+
+**Proof:** Add empty, one-byte-short, exact-size, larger, and embedded-NUL cases using the existing native fixture.
+The short-buffer regression must fail before the fix and report a Lisp error after it.
+Run FFI and core/embedding checks in baseline, ASan, and UBSan modes.
+
+**Commit:** `Validate FFI structure argument lengths`
+
+### Item 16 — Reject truncated FFI signatures
+
+**Priority:** Medium. **Status:** Proposed; reproduced on the baseline binary.
+
+`ffiPreparation` stops at `MAX_TYPE_ARGS` without rejecting remaining declaration tokens.
+Importing `labs` with 32 `long` arguments followed by `NOT_A_TYPE` succeeds; the invalid trailing token is ignored.
+The review imports this deliberately invalid signature without calling the native function.
+A silently shortened signature can use the wrong ABI if later called.
+
+Validate the complete declaration. Reject excess arguments rather than truncating them.
+Keep variadic-marker checks active at the argument limit and preserve supported zero-argument syntax.
+
+**Proof:** Test 31, 32, and 33 arguments, invalid trailing tokens, and markers around the limit.
+Verify existing fixed and variadic fixtures under baseline and sanitizers.
+
+**Commit:** `Reject oversized FFI signatures`
+
+### Item 17 — Reject unknown native build modes
+
+**Priority:** Medium. **Status:** Proposed; reproduced through make.
+
+`MODE=assn` returns a build path successfully and falls through to O1 without sanitizer flags.
+A misspelled sanitizer mode can therefore produce an ordinary binary without an error.
+
+Validate MODE against the supported baseline, debug, sanitizer, release, and PGO names.
+Report the supported values when a mode is unknown. Preserve explicit compiler/flag overrides.
+
+**Proof:** Unknown and misspelled modes must fail before dependency probing or compilation.
+Check each supported mode and confirm sanitizer flags remain present in compile and link commands.
+
+**Commit:** `Validate native build mode names`
+
+### Item 18 — Allow cleanup without a valid PGO profile
+
+**Priority:** Low. **Status:** Proposed; reproduced with a dry run.
+
+`make -n -f makefile_darwin_arm64 clean MODE=pgo-use PROFILE=/tmp/newlisp-review-absent.profdata` fails at profile validation.
+The profile check runs during makefile parsing, before the clean target can run.
+No cleanup command was executed during this review.
+
+Skip profile validation for a clean-only invocation. Keep validation for build and mixed clean/build requests.
+
+**Proof:** Dry-run clean must work with missing, corrupt, or stale profiles.
+Build requests and mixed goals must still reject those profiles.
+Verify ordinary cleanup in an isolated generated-output directory.
+
+**Commit:** `Allow PGO cleanup without profile data`
