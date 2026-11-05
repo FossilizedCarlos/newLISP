@@ -302,7 +302,7 @@ Implement and commit each approved item separately, in this order.
 
 ### Item 15 — Check structure argument buffer lengths
 
-**Priority:** High. **Status:** Proposed; reproduced under ASan.
+**Priority:** High. **Status:** Complete; reproduced under ASan.
 
 `executeLibFFI` copies `ffiType->size` bytes from a Lisp string without checking its length.
 With the existing fixture, the following call reads 12 bytes from a one-byte allocation:
@@ -325,6 +325,8 @@ The short-buffer regression must fail before the fix and report a Lisp error aft
 Run FFI and core/embedding checks in baseline, ASan, and UBSan modes.
 
 **Commit:** `Validate FFI structure argument lengths`
+
+**Completion:** Structure-string arguments are length-checked before copying. Empty, short, exact-size, larger, and embedded-NUL cases pass. Forced baseline, ASan, and UBSan core and embedding suites pass. Raw-pointer storage remains a caller obligation.
 
 ### Item 16 — Reject truncated FFI signatures
 

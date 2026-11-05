@@ -390,3 +390,8 @@ Make probes confirm that unknown modes fall back to O1 and missing PGO profiles 
 The cleanup probe uses dry-run mode and deletes nothing.
 These findings extend coverage beyond the earlier passing suites; they do not invalidate those recorded test results.
 No implementation changes occur in this review. New items await approval and retain one commit per item.
+
+
+### Follow-up item 15 complete
+
+Structure-string arguments are length-checked before copying. Empty, short, exact-size, larger, and embedded-NUL cases pass. Forced baseline, ASan, and UBSan core and embedding suites pass. Raw-pointer storage remains a caller obligation.

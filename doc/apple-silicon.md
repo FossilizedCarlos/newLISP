@@ -191,3 +191,7 @@ The workloads are synthetic. They do not establish performance for your applicat
 Use the [PGO procedure](apple-silicon-pgo.md) to train and validate a local profile.
 `MODE=pgo-generate` and `MODE=pgo-use` use separate O2 configurations.
 The ordinary O1 default and other release modes do not depend on profiles.
+
+FFI structure arguments supplied as strings must contain at least the native structure size in payload bytes.
+The terminating NUL is not payload. Larger buffers are accepted; embedded NUL bytes are preserved.
+Raw pointer arguments remain the responsibility of the caller, including storage size and lifetime.

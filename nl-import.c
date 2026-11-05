@@ -1019,7 +1019,11 @@ CELL * executeLibFFI(CELL * pCell, CELL * params)
             {
             cell = evaluateExpression(params);
             if(cell->type == CELL_STRING)
+                {
+                if(cell->aux == 0 || cell->aux - 1 < ffiType->size)
+                    errorProcExt(ERR_INVALID_PARAMETER, cell);
                 memcpy(avalues[c],(void*) cell->contents,ffiType->size);
+                }
             else
                 {
                 getIntegerExt(cell, (UINT *) &value, FALSE);
