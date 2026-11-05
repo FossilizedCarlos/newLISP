@@ -167,5 +167,6 @@ The workflow uses installed SDK dependencies and contains no package installatio
 
 Local YAML checks and the extracted baseline job script pass.
 The debug and sanitizer commands also pass locally as recorded in item 10.
-A hosted run has not occurred. Publishing the branch is required before GitHub can execute the workflow.
-Repository Actions policy and hosted execution remain unverified until that run.
+[Hosted run 41861645177](https://github.com/FossilizedCarlos/newLISP/actions/runs/41861645177), attempt 2, passes all four jobs for commit `74f40b0`.
+All jobs verify the native architecture, run core and embedding checks, and upload logs.
+The first attempt failed to acquire runners because of provider capacity; the rerun completes successfully.

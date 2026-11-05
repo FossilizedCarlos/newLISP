@@ -10,10 +10,10 @@ tags:
 
 ## Status and build responsibility
 
-The user approved implementation on 2026-11-04. Items 1–10, including additions 9a and 9b, are complete.
+The user approved implementation on 2026-11-04. Items 1–11, including additions 9a and 9b, are complete.
 The initial compilation and sanitizer failures are resolved in the tested core suite.
 A review after the Opus handoff confirms passing forced builds in baseline, debug, ASan, and UBSan modes.
-Item 11 is configured locally and awaits hosted verification. Items 12–14 remain pending.
+Hosted baseline, debug, ASan, and UBSan jobs pass. Items 12–14 remain pending.
 
 I will run `make` and inspect its output under the approved plan. You do not need to run it yourself.
 I will also run the regression tests, sanitizer builds, and benchmarks described below.
@@ -323,3 +323,10 @@ The README uses this fork's GitHub Actions badge and branch. Other repository li
 Upstream service badges are removed; no service account or project identifier is invented.
 The Debian package is retained as a labelled upstream link.
 This authorization supersedes the earlier restriction on branch publication.
+
+### 2026-11-05: Hosted ARM64 verification complete
+
+[Run 41861645177](https://github.com/FossilizedCarlos/newLISP/actions/runs/41861645177), attempt 2, passes all four jobs for commit `74f40b0`.
+Build, core QA, embedding, architecture checks, and log upload pass in each job.
+The first attempt was blocked by hosted runner capacity; it did not establish a source-code failure.
+Item 11 is complete. Item 12 can proceed with synthetic workloads.

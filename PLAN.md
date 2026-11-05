@@ -1,7 +1,7 @@
 # Apple Silicon implementation status
 
-Status: Approved on 2026-11-04. Items 1–10, including 9a and 9b, are complete.
-Item 11 is configured locally and awaits hosted verification. Items 12–14 remain pending. The current review confirms passing baseline, debug, ASan, and UBSan core QA.
+Status: Approved on 2026-11-04. Items 1–11, including 9a and 9b, are complete.
+Hosted ARM64 verification passes. Items 12–14 remain pending. The current review confirms passing baseline, debug, ASan, and UBSan core QA.
 Earlier failures below describe the state at each commit, not the current test results.
 
 The [detailed plan](Updating%20newLISP%20for%20Apple%20Silicon.md) defines each item and its verification.
@@ -144,13 +144,9 @@ Verify initialization, evaluation, return handling, and shutdown where supported
 
 **Commit:** `Support native ARM64 embedding and library loading`
 
-## Pending work
-
-Complete and commit each item before starting the next item.
-
 ### Item 11 — Add native ARM64 continuous integration
 
-**Status:** Configured locally; hosted verification pending.
+**Status:** Complete. **Implementation commit:** `0edef09`.
 
 The workflow is `.github/workflows/apple-silicon.yml`. It selects the standard ARM64 `macos-15` runner.
 Repository metadata confirms a public, active repository with `apple-silicon` as its default branch.
@@ -158,8 +154,10 @@ The matrix covers baseline, debug, ASan, and UBSan; each runs core QA and embedd
 It verifies binary architecture, retains logs for seven days, and installs no packages.
 YAML syntax, trigger structure, matrix values, and pinned action references pass local checks.
 The workflow's extracted baseline shell script passes locally. Other matrix commands passed during item 10.
-A hosted run is not yet verified. The user approved publishing `apple-silicon` and requested fork-specific README badges.
-Do not mark this item complete or start item 12 until hosted verification is resolved.
+[Hosted run](https://github.com/FossilizedCarlos/newLISP/actions/runs/41861645177), attempt 2, passes all four jobs for commit `74f40b0`.
+Each job passes toolchain checks, core QA, embedding checks, architecture checks, and log upload.
+All four log artifacts are present. The initial runner-capacity failures were resolved by the rerun.
+Verified through the GitHub API on 2026-11-05.
 
 Select an available native ARM64 runner after checking repository access, runner availability, and cost.
 Configure correctness and sanitizer jobs with preserved logs and test reports.
@@ -170,6 +168,10 @@ Include existing QA, FFI fixtures, integer and input boundaries, and embedding c
 If a runner is unavailable, record the blocker and do not claim CI verification is complete.
 
 **Commit:** `Add native Apple Silicon regression CI`
+
+## Pending work
+
+Complete and commit each item before starting the next item.
 
 ### Item 12 — Measure and select release optimization
 
@@ -243,7 +245,7 @@ Review logs are in `/tmp/newlisp-opus-review/` and are local temporary artifacts
 These results do not cover other architectures or tests outside the core suite.
 
 The review updates documentation only. The agent instruction file remains unchanged.
-Next action: Publish `apple-silicon`, then observe and verify the item 11 hosted workflow.
+Next action: Measure synthetic release-build candidates (item 12).
 
 ## README badge update
 
