@@ -415,3 +415,16 @@ Unknown, empty, and multiple MODE values stop before dependency or profile check
 ### Follow-up item 18 complete
 
 Clean-only PGO use skips profile validation. Default, build, and mixed goals still reject missing, corrupt, and stale profiles. Run python3 build-support/test-native-build.py: all four tests pass. Dry-run and actual cleanup pass in temporary directories. Cleanup removes build/arm64 and retains other outputs. The real validator uses a fixed test identity. No native compilation or profile training runs. Makefile changes invalidate existing profile manifests; train again before the next PGO build.
+
+
+### 2026-11-06: Additional memory-boundary fixes
+
+Approved item 21 bounds symbol prefix comparisons before reading a second byte from an empty name.
+Empty names remain supported. Tests cover creation, lookup, ordering, contexts, deletion, and recreation.
+Approved item 22 rejects undersized strings during nested structure packing.
+A related ASan reproduction showed that structure unpacking also lacked a payload-length check; item 22 includes that bounded correction.
+Exact-size, larger, embedded-NUL, and multilevel buffers pass. Integer addresses retain caller-managed storage obligations.
+Forced baseline, ASan, and UBSan core and embedding suites pass. Independent reruns of the original cases pass in all three modes.
+Two early symbol-test harness failures used an invalid primitive name; verification was revised to use `term`.
+The release tag and draft assets still refer to the earlier code and remain on hold. These fixes do not update published version identifiers.
+Private reviews and deferred items 19–20 remain uncommitted.

@@ -826,8 +826,17 @@ while( (elem = *elements++) != NULL)
         }
     else if(elem == &ffi_type_pointer || elem == &ffi_type_charpointer)
         memcpy(data + offset, (void *)&cell->contents, sizeof(void *));
-    else /* just copy what's there, must be struct */
+    else /* nested structure: strings must contain the full byte payload */
+        {
+        if(cell->type == CELL_STRING &&
+           (cell->aux == 0 || cell->aux - 1 < elem->size))
+            {
+            free(data);
+            return(errorProcExt(ERR_INVALID_PARAMETER, cell));
+            }
+        /* Integer addresses retain the caller-managed buffer contract. */
         memcpy(data + offset, (void *)cell->contents, elem->size);
+        }
 
     /* grow offset by size of last element */
     offset += elem->size;

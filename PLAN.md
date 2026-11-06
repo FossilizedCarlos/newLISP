@@ -438,7 +438,7 @@ Preserve empty symbol names and unsigned lexical ordering. Read the second prefi
 
 ### Item 22 — Validate nested structure string buffers
 
-**Status:** Approved; pending item 21.
+**Status:** Complete; verified.
 
 Check the available string payload before copying a nested FFI structure. Preserve documented raw integer-address behavior. Inspect related unpack bounds within this scope.
 
@@ -449,3 +449,9 @@ Check the available string payload before copying a nested FFI structure. Preser
 Item 21 verification adjustment: two harness runs failed because `name` is not a newLISP symbol-name function (the first attempted correction misidentified shadowing). Re-plan: use `term`, confirmed in an isolated interpreter probe, then rerun all targeted modes. No source-change failure occurred.
 
 Item 21 completion: guarded second-byte prefix reads preserve empty names and the existing unsigned ordering at find, insert, and delete. Forced `make -B` builds and symbol regression pass in baseline, ASan, and UBSan; logs `/tmp/newlisp-item21-{baseline,asan,ubsan}-{build,test}.log`.
+
+Item 22 bounded unpack adjustment: ASan also reproduces a short string overread through `unpack outer ""` (log `/tmp/newlisp-memory-repro/asan-unpack.log`). `p_unpack` already computes string payload length but bypasses bounds on structure dispatch. Check the complete structure size before that dispatch; recursive unpack then stays inside that validated buffer. Integer addresses retain the existing caller-managed contract.
+
+Item 22 completion: nested string copies reject payloads shorter than the nested structure and release the temporary output before raising the parameter error. Structure unpack dispatch checks its complete known string payload. Exact/larger buffers, embedded NULs, nested/multilevel packing, terminator exclusion, and live integer-address buffers pass. ASan targeted log: `/tmp/newlisp-item22-asan-test.log`.
+
+Final verification: forced `make -B -f makefile_darwin_arm64 core-check embedding-check MODE=<mode>` passes for baseline, ASan, and UBSan. Each log contains 28 success markers and no sanitizer/runtime/failure diagnostic. Logs: `/tmp/newlisp-memory-final-{baseline,asan,ubsan}.log`. Baseline executable and shared library restored with `make ... all shared MODE=baseline` (log `/tmp/newlisp-memory-baseline-restore.log`). Existing compiler indentation/prototype warnings remain. No installations, pushes, tags, release changes, or private-report edits. Raw addresses still require callers to supply valid readable storage; unrelated FFI declaration/callback issues are outside this fix.

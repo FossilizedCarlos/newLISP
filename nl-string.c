@@ -1909,7 +1909,12 @@ else
 #ifdef FFI
 cell = evaluateExpression(params);
 if(cell->type == CELL_IMPORT_FFI)
+    {
+    if(((FFIMPORT *)cell->aux)->cstruct &&
+       maxlen < ((FFIMPORT *)cell->aux)->cstruct->size)
+        return(errorProc(ERR_INVALID_PARAMETER));
     return(unpackFFIstruct(cell, pPtr)); /* nl-import.c */
+    }
 if(cell->type != CELL_STRING)
     return(errorProc(ERR_INVALID_PARAMETER));
 format = (char *)cell->contents;
