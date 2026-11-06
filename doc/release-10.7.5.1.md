@@ -10,6 +10,8 @@ The release contains one ARM64 command-line executable. It does not contain an e
 - Require an explicit `"..."` marker for variadic typed imports. Use promoted C types after the marker.
 - Reject invalid FFI types, argument counts, oversized signatures, and incorrect structure lengths.
 - Limit untyped native calls to supported integer and pointer signatures. Use typed imports for other signatures.
+- Preserve empty symbol names and bound symbol prefix comparisons.
+- Reject short string buffers during nested structure packing and structure unpacking.
 - Define integer boundary behavior and correct read-line, t-test, XML, and bigint memory faults.
 - Add core, native-call, callback, embedding, AddressSanitizer, and UndefinedBehaviorSanitizer checks.
 - Keep `-O1` as the default build. Add optional measured optimization modes and profile-guided optimization.
@@ -24,7 +26,8 @@ The banner, package name, and CGI `SERVER_SOFTWARE` identify fork release `10.7.
 The numeric language version stays `10705` for compatibility with existing `sys-info` version checks.
 The HTTP numeric version fields retain that same compatibility value.
 Do not interpret the fork suffix as another digit in the numeric language version.
-The inherited reference manual describes the upstream 10.7.5 language.
+The inherited reference manual describes the upstream newLISP 10.7.5 language.
+Existing newLISP dynamic scoping and value-copying behavior remain unchanged.
 
 ## Installation and use
 

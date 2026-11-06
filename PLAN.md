@@ -425,6 +425,37 @@ No software was installed. No new benchmark measurements or performance claims a
 Other architectures, shared-library unload/reload, and concurrent evaluation remain outside the verified scope.
 Further interpreter optimization requires a separate proposal and approval.
 
+## Future investigations — deferred, not authorized for implementation
+
+The user requested these entries for future consideration only. Do not start investigation or implementation without a new instruction.
+The completed Apple Silicon work does not change either underlying language design.
+Background: [newLISP article and design criticism](https://dev.to/taw/100-languages-speedrun-episode-92-newlisp-3l39).
+
+### Item 19 — Evaluate scoping and lexical closures
+
+**Status:** Deferred; future investigation only.
+
+Examine dynamic scoping and the lack of automatic lexical capture in returned lambdas.
+Use the article's adder example to define the expected behavior and compare it with current semantics.
+Assess existing context-based techniques and possible explicit or optional lexical-closure support.
+Document effects on variable lookup, mutation, recursion, captured-value lifetime, and existing programs.
+Treat any default scoping change as a compatibility decision, not a routine bug fix.
+
+**Future deliverable:** A design comparison, compatibility examples, and a proposed test strategy before any implementation approval.
+
+### Item 20 — Evaluate copying costs and memory ownership
+
+**Status:** Deferred; future investigation only.
+
+Examine list argument copying, temporary-result ownership transfer, and cell cleanup costs.
+Distinguish copies required by current semantics from copies that can safely be avoided.
+Use the existing native profiles as a starting point; obtain representative application workloads before drawing general conclusions.
+Assess targeted copy elimination and, separately, broader ownership or storage changes such as copy-on-write or shared values.
+Document effects on mutation, aliasing, native calls, memory use, and backward compatibility.
+Do not assume that replacing the memory model will improve performance.
+
+**Future deliverable:** Measured allocation/copy behavior, design tradeoffs, and a bounded experiment proposal before any implementation approval.
+
 
 ## Approved memory safety fixes — 2026-11-06
 
@@ -455,3 +486,12 @@ Item 22 bounded unpack adjustment: ASan also reproduces a short string overread 
 Item 22 completion: nested string copies reject payloads shorter than the nested structure and release the temporary output before raising the parameter error. Structure unpack dispatch checks its complete known string payload. Exact/larger buffers, embedded NULs, nested/multilevel packing, terminator exclusion, and live integer-address buffers pass. ASan targeted log: `/tmp/newlisp-item22-asan-test.log`.
 
 Final verification: forced `make -B -f makefile_darwin_arm64 core-check embedding-check MODE=<mode>` passes for baseline, ASan, and UBSan. Each log contains 28 success markers and no sanitizer/runtime/failure diagnostic. Logs: `/tmp/newlisp-memory-final-{baseline,asan,ubsan}.log`. Baseline executable and shared library restored with `make ... all shared MODE=baseline` (log `/tmp/newlisp-memory-baseline-restore.log`). Existing compiler indentation/prototype warnings remain. No installations, pushes, tags, release changes, or private-report edits. Raw addresses still require callers to supply valid readable storage; unrelated FFI declaration/callback issues are outside this fix.
+
+## Release preparation refresh — 2026-11-06
+
+The user authorizes repository cleanup and release preparation. Items 19–20 remain deferred; no investigation or implementation begins.
+Public release notes now include items 21–22. Private review files remain local through `.git/info/exclude`.
+A fresh package passes core and embedding checks. Extracted artifact checks pass for contents, ARM64, minimum macOS 27.0, version, and original probes.
+Logs: `/tmp/newlisp-release-ready-package.log` and `/tmp/newlisp-release-ready-artifact.log`.
+SHA-256: `06a9f16e9eb342ad34dbb9f4403436c2ca85d9707ddeaca1dc05ebb733cf3ab3`.
+Tag and draft-asset refresh remain the next release-preparation step. The user will publish the release.

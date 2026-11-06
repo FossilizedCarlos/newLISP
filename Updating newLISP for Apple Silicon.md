@@ -426,5 +426,17 @@ A related ASan reproduction showed that structure unpacking also lacked a payloa
 Exact-size, larger, embedded-NUL, and multilevel buffers pass. Integer addresses retain caller-managed storage obligations.
 Forced baseline, ASan, and UBSan core and embedding suites pass. Independent reruns of the original cases pass in all three modes.
 Two early symbol-test harness failures used an invalid primitive name; verification was revised to use `term`.
-The release tag and draft assets still refer to the earlier code and remain on hold. These fixes do not update published version identifiers.
-Private reviews and deferred items 19–20 remain uncommitted.
+The release package now includes both fixes. Local artifact validation passes.
+The release is ready for tag and draft-asset refresh. The user will publish the release.
+The fork version remains 10.7.5.1. Private reviews remain local; items 19–20 remain deferred.
+
+### 2026-11-06: Release package ready
+
+A fresh staging directory contains the macOS 27 ARM64 command-line release.
+The package script passes core and embedding checks. The archive contains exactly the six intended members.
+The extracted executable reports 10.7.5.1 and numeric version 10705, requires macOS 27.0, and links system libraries.
+Symbol-prefix, FFI-storage, and original empty-symbol, nested-pack, and unpack probes pass.
+The first standalone storage check omitted its required fixture environment; the corrected invocation passes.
+Logs: `/tmp/newlisp-release-ready-package.log` and `/tmp/newlisp-release-ready-artifact.log`.
+SHA-256: `06a9f16e9eb342ad34dbb9f4403436c2ca85d9707ddeaca1dc05ebb733cf3ab3`.
+No installation or publication occurs. The user will publish the release.
