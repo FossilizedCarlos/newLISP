@@ -27,8 +27,8 @@
 
 
 #define str2cmp(s1,s2) \
-    (( (*(unsigned char *)(s1) << 8) |  *((unsigned char *)(s1) + 1) ) - \
-     ( (*(unsigned char *)(s2) << 8) |  *((unsigned char *)(s2) + 1) )  )
+    (( (*(unsigned char *)(s1) << 8) |  (*(unsigned char *)(s1) ? *((unsigned char *)(s1) + 1) : 0) ) - \
+     ( (*(unsigned char *)(s2) << 8) |  (*(unsigned char *)(s2) ? *((unsigned char *)(s2) + 1) : 0) )  )
                          
 
 extern CELL * cellMemory;

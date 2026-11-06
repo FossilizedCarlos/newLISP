@@ -424,3 +424,28 @@ Local logs:
 No software was installed. No new benchmark measurements or performance claims are added.
 Other architectures, shared-library unload/reload, and concurrent evaluation remain outside the verified scope.
 Further interpreter optimization requires a separate proposal and approval.
+
+
+## Approved memory safety fixes — 2026-11-06
+
+### Item 21 — Bound empty symbol prefix comparisons
+
+**Status:** Complete; verified.
+
+Preserve empty symbol names and unsigned lexical ordering. Read the second prefix byte only for nonempty names at all shared lookup, insertion, and deletion sites.
+
+**Proof:** First reproduce the existing ASan failure. Add empty, one-character, common-prefix, context, lookup, and deletion regressions; run them with forced baseline, ASan, and UBSan builds. Commit this item independently before item 22.
+
+### Item 22 — Validate nested structure string buffers
+
+**Status:** Approved; pending item 21.
+
+Check the available string payload before copying a nested FFI structure. Preserve documented raw integer-address behavior. Inspect related unpack bounds within this scope.
+
+**Proof:** First reproduce the existing ASan failure. Test empty, short, exact, larger, embedded-NUL, multilevel, valid nested packing, and unpack boundaries. Force builds and run full baseline, ASan, and UBSan core and embedding suites after the final fix. Commit independently. No push, tag, release, or private-report changes.
+
+**Execution notes:** Existing baseline accepts both probes; existing ASan aborts with heap-buffer-overflow for both. Logs: `/tmp/newlisp-memory-repro/{baseline,asan}-{symbol,nested}.log`. Existing sanitizer binary provenance is as described in the private review; subsequent checks use forced fresh builds. Items 19 and 20 remain deferred and their preexisting local-only changes are excluded from these commits.
+
+Item 21 verification adjustment: two harness runs failed because `name` is not a newLISP symbol-name function (the first attempted correction misidentified shadowing). Re-plan: use `term`, confirmed in an isolated interpreter probe, then rerun all targeted modes. No source-change failure occurred.
+
+Item 21 completion: guarded second-byte prefix reads preserve empty names and the existing unsigned ordering at find, insert, and delete. Forced `make -B` builds and symbol regression pass in baseline, ASan, and UBSan; logs `/tmp/newlisp-item21-{baseline,asan,ubsan}-{build,test}.log`.

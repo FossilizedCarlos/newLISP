@@ -89,7 +89,7 @@ ffi-check: all $(BUILD_DIR)/ffitest.dylib
 	NEWLISP_TEST_LIBRARY='$(abspath $(BUILD_DIR)/ffitest.dylib)' sh build-support/run-qa.sh ./newlisp qa-specific-tests/qa-ffi-storage $(BUILD_DIR)/qa-ffi-storage.log
 	NEWLISP_TEST_LIBRARY='$(abspath $(BUILD_DIR)/ffitest.dylib)' sh build-support/run-qa.sh ./newlisp qa-specific-tests/qa-ffi-abi $(BUILD_DIR)/qa-ffi-abi.log
 
-CORE_QA := qa-specific-tests/qa-integer-boundaries qa-specific-tests/qa-read-line qa-specific-tests/qa-ttest-bounds qa-specific-tests/qa-xml-bounds qa-specific-tests/qa-bigint-division qa-dot qa-specific-tests/qa-dictionary qa-specific-tests/qa-xml  qa-specific-tests/qa-json qa-specific-tests/qa-ref qa-specific-tests/qa-blockmemory  qa-specific-tests/qa-exception qa-specific-tests/qa-float qa-specific-tests/qa-foop  qa-specific-tests/qa-inplace qa-specific-tests/qa-longnum
+CORE_QA := qa-specific-tests/qa-symbol-prefix qa-specific-tests/qa-integer-boundaries qa-specific-tests/qa-read-line qa-specific-tests/qa-ttest-bounds qa-specific-tests/qa-xml-bounds qa-specific-tests/qa-bigint-division qa-dot qa-specific-tests/qa-dictionary qa-specific-tests/qa-xml  qa-specific-tests/qa-json qa-specific-tests/qa-ref qa-specific-tests/qa-blockmemory  qa-specific-tests/qa-exception qa-specific-tests/qa-float qa-specific-tests/qa-foop  qa-specific-tests/qa-inplace qa-specific-tests/qa-longnum
 .PHONY: core-check
 core-check: ffi-check
 	@set -e; for test in $(CORE_QA); do 	  sh build-support/run-qa.sh ./newlisp $$test $(BUILD_DIR)/$$(basename $$test).log; 	done
